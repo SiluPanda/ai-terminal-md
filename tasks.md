@@ -56,12 +56,12 @@
 
 ### 2.1 Theme Definitions (`src/theme.ts`)
 
-- [ ] **Implement `dark` theme** — Define all style values for the default dark theme: bright white H1, bright cyan H2, yellow H3, green H4, dim white H5/H6; magenta keywords, green strings, yellow numbers, dim gray comments, cyan operators, blue types; dimmed thinking text; etc. as described in spec sections 6 and 10. | Status: not_done
-- [ ] **Implement `light` theme** — Define all style values for light terminal backgrounds. Use darker colors, avoid yellow/bright white, use black for body text. | Status: not_done
-- [ ] **Implement `minimal` theme** — Define styles using only bold, dim, and underline attributes. No foreground color changes for body text. Code blocks use background but no syntax highlighting. | Status: not_done
-- [ ] **Implement `monochrome` theme** — Define styles using only bold, dim, underline, italic, and strikethrough. No color codes at all. Elements distinguished by text decoration. | Status: not_done
-- [ ] **Implement theme loading and merging** — Write a function that accepts a `ThemeName | Partial<Theme> & { baseTheme?: ThemeName }` and returns a complete `Theme`. Merge custom overrides onto the base theme, defaulting to dark. | Status: not_done
-- [ ] **Implement theme auto-detection** — When no theme is specified, detect dark/light via `COLORFGBG` env var. Check `AI_TERMINAL_MD_THEME` env var for override. Default to dark. | Status: not_done
+- [x] **Implement `dark` theme** — Define all style values for the default dark theme: bright white H1, bright cyan H2, yellow H3, green H4, dim white H5/H6; magenta keywords, green strings, yellow numbers, dim gray comments, cyan operators, blue types; dimmed thinking text; etc. as described in spec sections 6 and 10. | Status: done
+- [x] **Implement `light` theme** — Define all style values for light terminal backgrounds. Use darker colors, avoid yellow/bright white, use black for body text. | Status: done
+- [x] **Implement `minimal` theme** — Define styles using only bold, dim, and underline attributes. No foreground color changes for body text. Code blocks use background but no syntax highlighting. | Status: done
+- [x] **Implement `monochrome` theme** — Define styles using only bold, dim, underline, italic, and strikethrough. No color codes at all. Elements distinguished by text decoration. | Status: done
+- [x] **Implement theme loading and merging** — Write a function that accepts a `ThemeName | Partial<Theme> & { baseTheme?: ThemeName }` and returns a complete `Theme`. Merge custom overrides onto the base theme, defaulting to dark. | Status: done
+- [x] **Implement theme auto-detection** — When no theme is specified, detect dark/light via `COLORFGBG` env var. Check `AI_TERMINAL_MD_THEME` env var for override. Default to dark. | Status: done
 
 ---
 
