@@ -104,29 +104,29 @@
 
 - [x] **Export `render(markdown, options?)` function** — Top-level function that creates a default renderer with provided options and renders the markdown. | Status: done
 - [x] **Export `createRenderer(config?)` factory** — Factory function that returns a configured `AITerminalRenderer` instance. | Status: done
-- [ ] **Export all public types** — Export `RendererConfig`, `RenderOptions`, `AITerminalRenderer`, `StreamState`, `Theme`, `ThemeName`, `Style`, `CustomHighlighter`, `HighlightToken`, `TokenCategory`. | Status: not_done
+- [x] **Export all public types** — Export `RendererConfig`, `RenderOptions`, `AITerminalRenderer`, `StreamState`, `Theme`, `ThemeName`, `Style`, `CustomHighlighter`, `HighlightToken`, `TokenCategory`. | Status: done
 
 ### 3.4 Phase 1 Tests
 
-- [ ] **Test H1-H6 header rendering** — Verify each heading level renders with the correct ANSI attributes (bold, correct color). Verify H1 has double-line underline, H2 has single-line underline, H3-H6 have none. | Status: not_done
-- [ ] **Test bold/italic/strikethrough rendering** — Verify `**bold**` produces `\x1b[1m`, `*italic*` produces `\x1b[3m`, `~~strike~~` produces `\x1b[9m`. | Status: not_done
-- [ ] **Test inline code rendering** — Verify `` `code` `` gets background color applied. | Status: not_done
-- [ ] **Test code block rendering** — Verify fenced code blocks get background color, language label, padding, and optional line numbers. Verify code is not word-wrapped. | Status: not_done
-- [ ] **Test unordered list rendering** — Verify correct bullet characters per nesting level. Verify indentation. | Status: not_done
-- [ ] **Test ordered list rendering** — Verify numbering and nested sub-item lettering. | Status: not_done
-- [ ] **Test task list rendering** — Verify `[x]` shows green check, `[ ]` shows empty box. | Status: not_done
-- [ ] **Test link rendering** — Verify underlined text and URL display. Test `showLinkUrls: false`. | Status: not_done
-- [ ] **Test blockquote rendering** — Verify left border, dimmed text, and nested blockquote additional borders. | Status: not_done
-- [ ] **Test table rendering** — Verify box-drawing borders, column alignment, auto-sizing, bold headers. Test all `tableStyle` options. | Status: not_done
-- [ ] **Test horizontal rule rendering** — Verify full-width line. | Status: not_done
-- [ ] **Test image placeholder rendering** — Verify `[Image: alt]` and `[Image]` output. | Status: not_done
-- [ ] **Test word wrapping** — Verify text wraps at configured width. Verify code blocks are exempt. | Status: not_done
-- [ ] **Test width adaptation** — Verify wrapping at width 40 vs width 120. | Status: not_done
-- [ ] **Test non-TTY output** — Verify ANSI codes are stripped when `isTTY` is false. | Status: not_done
-- [ ] **Test `colorLevel: 'none'`** — Verify no ANSI color codes in output. Bold/dim/underline attributes may still appear. | Status: not_done
-- [ ] **Test `unicode: false`** — Verify box-drawing characters are replaced with ASCII equivalents. | Status: not_done
-- [ ] **Test margin option** — Verify left margin spaces are applied to all content. | Status: not_done
-- [ ] **Create test fixtures for standard markdown** — Create `src/__tests__/fixtures/markdown.ts` with reusable markdown input strings and expected output patterns. | Status: not_done
+- [x] **Test H1-H6 header rendering** — Verify each heading level renders with the correct ANSI attributes (bold, correct color). Verify H1 has double-line underline, H2 has single-line underline, H3-H6 have none. | Status: done
+- [x] **Test bold/italic/strikethrough rendering** — Verify `**bold**` produces `\x1b[1m`, `*italic*` produces `\x1b[3m`, `~~strike~~` produces `\x1b[9m`. | Status: done
+- [x] **Test inline code rendering** — Verify `` `code` `` gets background color applied. | Status: done
+- [x] **Test code block rendering** — Verify fenced code blocks get background color, language label, padding, and optional line numbers. Verify code is not word-wrapped. | Status: done
+- [x] **Test unordered list rendering** — Verify correct bullet characters per nesting level. Verify indentation. | Status: done
+- [x] **Test ordered list rendering** — Verify numbering and nested sub-item lettering. | Status: done
+- [x] **Test task list rendering** — Verify `[x]` shows green check, `[ ]` shows empty box. | Status: done
+- [x] **Test link rendering** — Verify underlined text and URL display. Test `showLinkUrls: false`. | Status: done
+- [x] **Test blockquote rendering** — Verify left border, dimmed text, and nested blockquote additional borders. | Status: done
+- [x] **Test table rendering** — Verify box-drawing borders, column alignment, auto-sizing, bold headers. Test all `tableStyle` options. | Status: done
+- [x] **Test horizontal rule rendering** — Verify full-width line. | Status: done
+- [x] **Test image placeholder rendering** — Verify `[Image: alt]` and `[Image]` output. | Status: done
+- [x] **Test word wrapping** — Verify text wraps at configured width. Verify code blocks are exempt. | Status: done
+- [x] **Test width adaptation** — Verify wrapping at width 40 vs width 120. | Status: done
+- [x] **Test non-TTY output** — Verify ANSI codes are stripped when `isTTY` is false. | Status: done
+- [x] **Test `colorLevel: 'none'`** — Verify no ANSI color codes in output. Bold/dim/underline attributes may still appear. | Status: done
+- [x] **Test `unicode: false`** — Verify box-drawing characters are replaced with ASCII equivalents. | Status: done
+- [x] **Test margin option** — Verify left margin spaces are applied to all content. | Status: done
+- [x] **Create test fixtures for standard markdown** — Create `src/__tests__/fixtures/markdown.ts` with reusable markdown input strings and expected output patterns. | Status: done
 
 ---
 
