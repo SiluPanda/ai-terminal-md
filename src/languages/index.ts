@@ -1,5 +1,6 @@
 import type { HighlightToken } from '../types';
 import { tokenizeJavaScript, tokenizeTypeScript } from './javascript';
+import { tokenizePython } from './python';
 import { tokenizeRust } from './rust';
 import { tokenizeGo } from './go';
 import { tokenizeJava } from './java';
@@ -55,6 +56,7 @@ const aliases: Record<string, string> = {
 const tokenizers: Record<string, LanguageTokenizer | undefined> = {
   javascript: tokenizeJavaScript,
   typescript: tokenizeTypeScript,
+  python: tokenizePython,
   rust: tokenizeRust,
   go: tokenizeGo,
   java: tokenizeJava,
