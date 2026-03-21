@@ -69,19 +69,19 @@
 
 ### 3.1 Markdown Renderer (`src/render-markdown.ts`)
 
-- [ ] **Set up `marked` custom renderer** — Create a custom `marked.Renderer` subclass (or use `marked`'s renderer hooks) that overrides rendering methods for each element type to produce ANSI-formatted strings. | Status: not_done
-- [ ] **Render H1 headers** — Bold, bright white text with full-width double-line underline (`═`). Preceded and followed by one blank line. | Status: not_done
-- [ ] **Render H2 headers** — Bold, bright cyan text with single-line underline (`─`). Preceded and followed by one blank line. | Status: not_done
-- [ ] **Render H3 headers** — Bold, yellow text. No underline. Preceded and followed by blank line. | Status: not_done
-- [ ] **Render H4 headers** — Bold, green text. No underline. Preceded and followed by blank line. | Status: not_done
-- [ ] **Render H5 headers** — Bold, dim white text. No underline. Preceded and followed by blank line. | Status: not_done
-- [ ] **Render H6 headers** — Bold, dim text. No underline. Preceded and followed by blank line. | Status: not_done
-- [ ] **Render paragraphs** — Body text with word wrapping applied per terminal width and margin settings. | Status: not_done
-- [ ] **Render bold text** — Apply bold ANSI attribute (`\x1b[1m`). | Status: not_done
-- [ ] **Render italic text** — Apply italic ANSI attribute (`\x1b[3m`). | Status: not_done
-- [ ] **Render strikethrough text** — Apply strikethrough ANSI attribute (`\x1b[9m`). | Status: not_done
-- [ ] **Render bold+italic combined** — Apply both bold and italic attributes together. | Status: not_done
-- [ ] **Render inline code** — Apply distinct background color (muted tone) to inline code spans. | Status: not_done
+- [x] **Set up `marked` custom renderer** — Create a custom `marked.Renderer` subclass (or use `marked`'s renderer hooks) that overrides rendering methods for each element type to produce ANSI-formatted strings. | Status: done
+- [x] **Render H1 headers** — Bold, bright white text with full-width double-line underline (`═`). Preceded and followed by one blank line. | Status: done
+- [x] **Render H2 headers** — Bold, bright cyan text with single-line underline (`─`). Preceded and followed by one blank line. | Status: done
+- [x] **Render H3 headers** — Bold, yellow text. No underline. Preceded and followed by blank line. | Status: done
+- [x] **Render H4 headers** — Bold, green text. No underline. Preceded and followed by blank line. | Status: done
+- [x] **Render H5 headers** — Bold, dim white text. No underline. Preceded and followed by blank line. | Status: done
+- [x] **Render H6 headers** — Bold, dim text. No underline. Preceded and followed by blank line. | Status: done
+- [x] **Render paragraphs** — Body text with word wrapping applied per terminal width and margin settings. | Status: done
+- [x] **Render bold text** — Apply bold ANSI attribute (`\x1b[1m`). | Status: done
+- [x] **Render italic text** — Apply italic ANSI attribute (`\x1b[3m`). | Status: done
+- [x] **Render strikethrough text** — Apply strikethrough ANSI attribute (`\x1b[9m`). | Status: done
+- [x] **Render bold+italic combined** — Apply both bold and italic attributes together. | Status: done
+- [x] **Render inline code** — Apply distinct background color (muted tone) to inline code spans. | Status: done
 - [ ] **Render code blocks (without syntax highlighting)** — Render fenced code blocks with: background color (configurable via `codeBackground`), language label at top-right (configurable via `codeLanguageLabel`), horizontal padding (configurable via `codePadding`), and optional line numbers (configurable via `codeLineNumbers`). Code is never word-wrapped. | Status: not_done
 - [ ] **Render unordered lists** — Use level-specific bullet characters: `●` (level 0), `○` (level 1), `■` (level 2), `▸` (level 3+). Two spaces indent per nesting level. Fall back to ASCII when unicode is disabled. | Status: not_done
 - [ ] **Render ordered lists** — Number followed by period. Nested ordered lists with their own numbering. Sub-items use `a.`, `b.`, etc. | Status: not_done
@@ -94,16 +94,16 @@
 
 ### 3.2 Renderer Class (`src/renderer.ts`)
 
-- [ ] **Implement `AITerminalRenderer` class** — Create the class that holds resolved config (theme, terminal capabilities, all options). Wire up `marked` parsing and the custom markdown renderer. | Status: not_done
-- [ ] **Implement `render(markdown)` method** — Parse markdown with `marked`, apply the custom renderer, return ANSI-formatted string. | Status: not_done
-- [ ] **Implement config resolution** — Merge explicit config options with env var overrides and auto-detected defaults. Priority: explicit config > env vars > auto-detected. Handle `AI_TERMINAL_MD_THEME`, `AI_TERMINAL_MD_THINKING`, `AI_TERMINAL_MD_WIDTH` env vars. | Status: not_done
+- [x] **Implement `AITerminalRenderer` class** — Create the class that holds resolved config (theme, terminal capabilities, all options). Wire up `marked` parsing and the custom markdown renderer. | Status: done
+- [x] **Implement `render(markdown)` method** — Parse markdown with `marked`, apply the custom renderer, return ANSI-formatted string. | Status: done
+- [x] **Implement config resolution** — Merge explicit config options with env var overrides and auto-detected defaults. Priority: explicit config > env vars > auto-detected. Handle `AI_TERMINAL_MD_THEME`, `AI_TERMINAL_MD_THINKING`, `AI_TERMINAL_MD_WIDTH` env vars. | Status: done
 - [ ] **Implement non-TTY mode** — When `stdout.isTTY` is false, strip all ANSI codes from output. Preserve structural formatting (indentation, line breaks, ASCII borders). | Status: not_done
 - [ ] **Implement margin support** — Apply left margin (configurable number of spaces) to all rendered content. | Status: not_done
 
 ### 3.3 Public API (`src/index.ts`)
 
-- [ ] **Export `render(markdown, options?)` function** — Top-level function that creates a default renderer with provided options and renders the markdown. | Status: not_done
-- [ ] **Export `createRenderer(config?)` factory** — Factory function that returns a configured `AITerminalRenderer` instance. | Status: not_done
+- [x] **Export `render(markdown, options?)` function** — Top-level function that creates a default renderer with provided options and renders the markdown. | Status: done
+- [x] **Export `createRenderer(config?)` factory** — Factory function that returns a configured `AITerminalRenderer` instance. | Status: done
 - [ ] **Export all public types** — Export `RendererConfig`, `RenderOptions`, `AITerminalRenderer`, `StreamState`, `Theme`, `ThemeName`, `Style`, `CustomHighlighter`, `HighlightToken`, `TokenCategory`. | Status: not_done
 
 ### 3.4 Phase 1 Tests

@@ -32,3 +32,6 @@ export { wordWrap } from './wrap';
 
 // Theme system
 export { resolveTheme, detectTheme, getTheme, hasColor } from './theme';
+
+// Renderer
+export { render, createRenderer } from './renderer';
