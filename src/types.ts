@@ -251,9 +251,16 @@ export interface RenderOptions extends RendererConfig {
   // Identical to RendererConfig — exists as a separate type for API clarity.
 }
 
-/** Opaque state for streaming rendering. */
+/** State for streaming rendering — a plain serializable object. */
 export interface StreamState {
-  readonly _internal: unknown;
+  /** Accumulated incomplete content not yet rendered. */
+  buffer: string;
+  /** Whether a fenced code block has been opened but not yet closed. */
+  openCodeBlock: boolean;
+  /** Language label of the current open code block (empty string if none). */
+  codeLang: string;
+  /** Whether a thinking block has been opened but not yet closed. */
+  openThinkingBlock: boolean;
 }
 
 /** Public renderer interface. */
