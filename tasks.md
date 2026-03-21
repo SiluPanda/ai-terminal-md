@@ -134,45 +134,45 @@
 
 ### 4.1 Highlighter Framework (`src/highlighter.ts`)
 
-- [ ] **Implement tokenizer framework** — Build the regex-based tokenizer that accepts code and a language identifier, dispatches to the language-specific token patterns, and returns `HighlightToken[]`. | Status: not_done
-- [ ] **Implement language dispatch** — Map language fence tags to tokenizer functions. Handle aliases (e.g., `js` -> JavaScript, `py` -> Python, `rs` -> Rust, etc.). | Status: not_done
-- [ ] **Implement custom highlighter integration** — When a `CustomHighlighter` is provided in config, call it first. If it returns an empty array or throws, fall back to the built-in tokenizer. | Status: not_done
-- [ ] **Handle unknown languages** — When the language tag is not recognized, return plain tokens (no syntax coloring). The code block still gets background and language label. | Status: not_done
+- [x] **Implement tokenizer framework** — Build the regex-based tokenizer that accepts code and a language identifier, dispatches to the language-specific token patterns, and returns `HighlightToken[]`. | Status: done
+- [x] **Implement language dispatch** — Map language fence tags to tokenizer functions. Handle aliases (e.g., `js` -> JavaScript, `py` -> Python, `rs` -> Rust, etc.). | Status: done
+- [x] **Implement custom highlighter integration** — When a `CustomHighlighter` is provided in config, call it first. If it returns an empty array or throws, fall back to the built-in tokenizer. | Status: done
+- [x] **Handle unknown languages** — When the language tag is not recognized, return plain tokens (no syntax coloring). The code block still gets background and language label. | Status: done
 
 ### 4.2 Language Definitions (`src/languages/`)
 
-- [ ] **Create language registry (`src/languages/index.ts`)** — Export a map from fence tag strings to tokenizer functions. | Status: not_done
-- [ ] **Implement JavaScript tokenizer (`src/languages/javascript.ts`)** — Token patterns for: keywords (`function`, `const`, `let`, `var`, `class`, `return`, `if`, `else`, `import`, `export`, etc.), strings (single/double/template literals), numbers, comments (line and block), regex literals, operators. | Status: not_done
-- [ ] **Implement TypeScript tokenizer (`src/languages/javascript.ts`)** — Extend JavaScript patterns with type keywords: `interface`, `type`, `enum`, `as`, `implements`, `readonly`, `keyof`, `infer`, etc. Share the same file since TS is a superset of JS. | Status: not_done
-- [ ] **Implement Python tokenizer (`src/languages/python.ts`)** — Keywords (`def`, `class`, `import`, `from`, `if`, `elif`, `else`, `return`, `yield`, `async`, `await`, etc.), strings (single/double/triple-quoted, f-strings), numbers, comments (`#`), decorators (`@`). | Status: not_done
-- [ ] **Implement Rust tokenizer (`src/languages/rust.ts`)** — Keywords (`fn`, `let`, `mut`, `impl`, `struct`, `enum`, `match`, `pub`, `use`, etc.), strings, lifetime annotations (`'a`), numbers, comments, macros (`name!`), attributes (`#[...]`). | Status: not_done
-- [ ] **Implement Go tokenizer (`src/languages/go.ts`)** — Keywords (`func`, `var`, `const`, `type`, `struct`, `interface`, `go`, `chan`, `select`, `defer`, etc.), strings, rune literals, numbers, comments, package names. | Status: not_done
-- [ ] **Implement Java tokenizer (`src/languages/java.ts`)** — Keywords (`public`, `private`, `class`, `interface`, `extends`, `implements`, `static`, `void`, etc.), strings, numbers, comments, annotations (`@Override`). | Status: not_done
-- [ ] **Implement Ruby tokenizer (`src/languages/ruby.ts`)** — Keywords (`def`, `class`, `module`, `end`, `do`, `if`, `unless`, `while`, etc.), strings, symbols (`:name`), numbers, comments (`#`), regex, heredocs. | Status: not_done
-- [ ] **Implement Shell/Bash tokenizer (`src/languages/shell.ts`)** — Keywords (`if`, `then`, `else`, `fi`, `for`, `while`, `do`, `done`, `case`, `esac`, etc.), strings, variables (`$VAR`, `${VAR}`), comments (`#`), command substitution (`$(...)`, backticks). | Status: not_done
-- [ ] **Implement SQL tokenizer (`src/languages/sql.ts`)** — Keywords (`SELECT`, `FROM`, `WHERE`, `INSERT`, `UPDATE`, `DELETE`, `CREATE`, `ALTER`, `DROP`, `JOIN`, etc., case-insensitive), strings, numbers, comments (`--`, `/* */`), operators. | Status: not_done
-- [ ] **Implement HTML tokenizer (`src/languages/web.ts`)** — Tags, attributes, attribute values, comments (`<!-- -->`), entities (`&amp;`). | Status: not_done
-- [ ] **Implement CSS tokenizer (`src/languages/web.ts`)** — Selectors, properties, values, colors (`#hex`, named), comments (`/* */`), at-rules (`@media`, `@import`). Share file with HTML. | Status: not_done
-- [ ] **Implement JSON tokenizer (`src/languages/data.ts`)** — Keys (distinct color), string values, numbers, booleans (`true`/`false`), `null`. | Status: not_done
-- [ ] **Implement YAML tokenizer (`src/languages/data.ts`)** — Keys, string values, numbers, booleans, comments (`#`), anchors (`&`, `*`). Share file with JSON. | Status: not_done
-- [ ] **Implement Markdown tokenizer (`src/languages/markdown.ts`)** — Headers (`#`), bold (`**`), italic (`*`), code (backticks), links, lists. For nested markdown inside code blocks. | Status: not_done
-- [ ] **Implement C/C++ tokenizer (`src/languages/c.ts`)** — Keywords (`int`, `char`, `void`, `struct`, `class`, `template`, `namespace`, `#include`, `#define`, etc.), strings, numbers, comments, preprocessor directives (`#`). | Status: not_done
-- [ ] **Implement PHP tokenizer (`src/languages/php.ts`)** — Keywords (`function`, `class`, `public`, `private`, `echo`, `namespace`, `use`, etc.), strings, variables (`$var`), numbers, comments. | Status: not_done
+- [x] **Create language registry (`src/languages/index.ts`)** — Export a map from fence tag strings to tokenizer functions. | Status: done
+- [x] **Implement JavaScript tokenizer (`src/languages/javascript.ts`)** — Token patterns for: keywords (`function`, `const`, `let`, `var`, `class`, `return`, `if`, `else`, `import`, `export`, etc.), strings (single/double/template literals), numbers, comments (line and block), regex literals, operators. | Status: done
+- [x] **Implement TypeScript tokenizer (`src/languages/javascript.ts`)** — Extend JavaScript patterns with type keywords: `interface`, `type`, `enum`, `as`, `implements`, `readonly`, `keyof`, `infer`, etc. Share the same file since TS is a superset of JS. | Status: done
+- [x] **Implement Python tokenizer (`src/languages/python.ts`)** — Keywords (`def`, `class`, `import`, `from`, `if`, `elif`, `else`, `return`, `yield`, `async`, `await`, etc.), strings (single/double/triple-quoted, f-strings), numbers, comments (`#`), decorators (`@`). | Status: done
+- [x] **Implement Rust tokenizer (`src/languages/rust.ts`)** — Keywords (`fn`, `let`, `mut`, `impl`, `struct`, `enum`, `match`, `pub`, `use`, etc.), strings, lifetime annotations (`'a`), numbers, comments, macros (`name!`), attributes (`#[...]`). | Status: done
+- [x] **Implement Go tokenizer (`src/languages/go.ts`)** — Keywords (`func`, `var`, `const`, `type`, `struct`, `interface`, `go`, `chan`, `select`, `defer`, etc.), strings, rune literals, numbers, comments, package names. | Status: done
+- [x] **Implement Java tokenizer (`src/languages/java.ts`)** — Keywords (`public`, `private`, `class`, `interface`, `extends`, `implements`, `static`, `void`, etc.), strings, numbers, comments, annotations (`@Override`). | Status: done
+- [x] **Implement Ruby tokenizer (`src/languages/ruby.ts`)** — Keywords (`def`, `class`, `module`, `end`, `do`, `if`, `unless`, `while`, etc.), strings, symbols (`:name`), numbers, comments (`#`), regex, heredocs. | Status: done
+- [x] **Implement Shell/Bash tokenizer (`src/languages/shell.ts`)** — Keywords (`if`, `then`, `else`, `fi`, `for`, `while`, `do`, `done`, `case`, `esac`, etc.), strings, variables (`$VAR`, `${VAR}`), comments (`#`), command substitution (`$(...)`, backticks). | Status: done
+- [x] **Implement SQL tokenizer (`src/languages/sql.ts`)** — Keywords (`SELECT`, `FROM`, `WHERE`, `INSERT`, `UPDATE`, `DELETE`, `CREATE`, `ALTER`, `DROP`, `JOIN`, etc., case-insensitive), strings, numbers, comments (`--`, `/* */`), operators. | Status: done
+- [x] **Implement HTML tokenizer (`src/languages/web.ts`)** — Tags, attributes, attribute values, comments (`<!-- -->`), entities (`&amp;`). | Status: done
+- [x] **Implement CSS tokenizer (`src/languages/web.ts`)** — Selectors, properties, values, colors (`#hex`, named), comments (`/* */`), at-rules (`@media`, `@import`). Share file with HTML. | Status: done
+- [x] **Implement JSON tokenizer (`src/languages/data.ts`)** — Keys (distinct color), string values, numbers, booleans (`true`/`false`), `null`. | Status: done
+- [x] **Implement YAML tokenizer (`src/languages/data.ts`)** — Keys, string values, numbers, booleans, comments (`#`), anchors (`&`, `*`). Share file with JSON. | Status: done
+- [x] **Implement Markdown tokenizer (`src/languages/markdown.ts`)** — Headers (`#`), bold (`**`), italic (`*`), code (backticks), links, lists. For nested markdown inside code blocks. | Status: done
+- [x] **Implement C/C++ tokenizer (`src/languages/c.ts`)** — Keywords (`int`, `char`, `void`, `struct`, `class`, `template`, `namespace`, `#include`, `#define`, etc.), strings, numbers, comments, preprocessor directives (`#`). | Status: done
+- [x] **Implement PHP tokenizer (`src/languages/php.ts`)** — Keywords (`function`, `class`, `public`, `private`, `echo`, `namespace`, `use`, etc.), strings, variables (`$var`), numbers, comments. | Status: done
 
 ### 4.3 Integrate Highlighting into Code Blocks
 
-- [ ] **Update code block rendering with syntax highlighting** — In `render-markdown.ts`, when a code block has a language tag, tokenize the code using the highlighter and apply theme colors per `TokenCategory`. If no language tag or unknown language, render as plain monospace text with background. | Status: not_done
+- [x] **Update code block rendering with syntax highlighting** — In `render-markdown.ts`, when a code block has a language tag, tokenize the code using the highlighter and apply theme colors per `TokenCategory`. If no language tag or unknown language, render as plain monospace text with background. | Status: done
 
 ### 4.4 Syntax Highlighting Tests
 
-- [ ] **Test JavaScript keyword highlighting** — Verify `function`, `const`, `return` are highlighted as keywords (magenta in dark theme). | Status: not_done
-- [ ] **Test JavaScript string highlighting** — Verify single-quoted, double-quoted, and template literal strings are highlighted (green in dark theme). | Status: not_done
+- [x] **Test JavaScript keyword highlighting** — Verify `function`, `const`, `return` are highlighted as keywords (magenta in dark theme). | Status: done
+- [x] **Test JavaScript string highlighting** — Verify single-quoted, double-quoted, and template literal strings are highlighted (green in dark theme). | Status: done
 - [ ] **Test Python highlighting** — Verify `def`, `class`, `import` are keywords; triple-quoted strings are highlighted; decorators are attributes. | Status: not_done
 - [ ] **Test JSON highlighting** — Verify keys and string values have distinct colors. Verify booleans and null are highlighted as constants. | Status: not_done
-- [ ] **Test unknown language fallback** — Verify code with unrecognized language tag renders as plain text with background but no color. | Status: not_done
-- [ ] **Test custom highlighter** — Verify custom highlighter output is used when provided. Verify fallback to built-in when custom returns empty array. Verify fallback when custom throws. | Status: not_done
+- [x] **Test unknown language fallback** — Verify code with unrecognized language tag renders as plain text with background but no color. | Status: done
+- [x] **Test custom highlighter** — Verify custom highlighter output is used when provided. Verify fallback to built-in when custom returns empty array. Verify fallback when custom throws. | Status: done
 - [ ] **Test all 15+ languages have basic highlighting** — Smoke tests for each language tokenizer: provide a short code sample and verify tokens are produced with non-plain categories. | Status: not_done
-- [ ] **Create test fixtures for code blocks** — Create `src/__tests__/fixtures/code-blocks.ts` with code samples per language. | Status: not_done
+- [x] **Create test fixtures for code blocks** — Create `src/__tests__/fixtures/code-blocks.ts` with code samples per language. | Status: done
 
 ---
 
