@@ -16,3 +16,16 @@ export type {
 
 // ANSI utilities
 export { applyStyle, stripAnsi, visibleLength } from './ansi';
+
+// Terminal capability detection
+export {
+  detectColorLevel,
+  detectUnicode,
+  getWidth,
+  isTTY,
+  getBoxChars,
+} from './terminal';
+export type { BoxChars } from './terminal';
+
+// Word wrapping
+export { wordWrap } from './wrap';
