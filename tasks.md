@@ -167,11 +167,11 @@
 
 - [x] **Test JavaScript keyword highlighting** — Verify `function`, `const`, `return` are highlighted as keywords (magenta in dark theme). | Status: done
 - [x] **Test JavaScript string highlighting** — Verify single-quoted, double-quoted, and template literal strings are highlighted (green in dark theme). | Status: done
-- [ ] **Test Python highlighting** — Verify `def`, `class`, `import` are keywords; triple-quoted strings are highlighted; decorators are attributes. | Status: not_done
-- [ ] **Test JSON highlighting** — Verify keys and string values have distinct colors. Verify booleans and null are highlighted as constants. | Status: not_done
+- [x] **Test Python highlighting** — Verify `def`, `class`, `import` are keywords; triple-quoted strings are highlighted; decorators are attributes. | Status: done
+- [x] **Test JSON highlighting** — Verify keys and string values have distinct colors. Verify booleans and null are highlighted as constants. | Status: done
 - [x] **Test unknown language fallback** — Verify code with unrecognized language tag renders as plain text with background but no color. | Status: done
 - [x] **Test custom highlighter** — Verify custom highlighter output is used when provided. Verify fallback to built-in when custom returns empty array. Verify fallback when custom throws. | Status: done
-- [ ] **Test all 15+ languages have basic highlighting** — Smoke tests for each language tokenizer: provide a short code sample and verify tokens are produced with non-plain categories. | Status: not_done
+- [x] **Test all 15+ languages have basic highlighting** — Smoke tests for each language tokenizer: provide a short code sample and verify tokens are produced with non-plain categories. | Status: done
 - [x] **Create test fixtures for code blocks** — Create `src/__tests__/fixtures/code-blocks.ts` with code samples per language. | Status: done
 
 ---
