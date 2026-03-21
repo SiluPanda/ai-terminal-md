@@ -37,18 +37,18 @@
 
 ### 1.3 Terminal Capability Detection (`src/terminal.ts`)
 
-- [ ] **Implement `detectColorLevel()` function** — Detect terminal color support using the priority chain: explicit config > `FORCE_COLOR` env > `NO_COLOR` env > `COLORTERM` env > `TERM` 256color check > `stdout.isTTY` > fallback to none. | Status: not_done
-- [ ] **Implement `detectUnicode()` function** — Detect Unicode box-drawing support: check `LANG`/`LC_ALL`/`LC_CTYPE` for UTF-8, `TERM` for modern terminal, `WT_SESSION` on Windows, default to true. | Status: not_done
-- [ ] **Implement `getWidth()` function** — Return terminal width from `process.stdout.columns` or default to 80 if undefined/non-TTY. | Status: not_done
-- [ ] **Implement `isTTY()` function** — Return `process.stdout.isTTY` boolean, defaulting to false. | Status: not_done
-- [ ] **Implement box-drawing character mapping** — Create a mapping object that returns Unicode or ASCII characters based on the unicode capability flag. Map all characters specified in the spec: `─`/`-`, `│`/`|`, `┌┐└┘`/`+`, `├┤┬┴┼`/`+`, `╭╮╰╯`/`+`, `═`/`=`, `●`/`*`, `○`/`-`, `■`/`+`, `▸`/`>`, `✓`/`[x]`, `☐`/`[ ]`. | Status: not_done
+- [x] **Implement `detectColorLevel()` function** — Detect terminal color support using the priority chain: explicit config > `FORCE_COLOR` env > `NO_COLOR` env > `COLORTERM` env > `TERM` 256color check > `stdout.isTTY` > fallback to none. | Status: done
+- [x] **Implement `detectUnicode()` function** — Detect Unicode box-drawing support: check `LANG`/`LC_ALL`/`LC_CTYPE` for UTF-8, `TERM` for modern terminal, `WT_SESSION` on Windows, default to true. | Status: done
+- [x] **Implement `getWidth()` function** — Return terminal width from `process.stdout.columns` or default to 80 if undefined/non-TTY. | Status: done
+- [x] **Implement `isTTY()` function** — Return `process.stdout.isTTY` boolean, defaulting to false. | Status: done
+- [x] **Implement box-drawing character mapping** — Create a mapping object that returns Unicode or ASCII characters based on the unicode capability flag. Map all characters specified in the spec: `─`/`-`, `│`/`|`, `┌┐└┘`/`+`, `├┤┬┴┼`/`+`, `╭╮╰╯`/`+`, `═`/`=`, `●`/`*`, `○`/`-`, `■`/`+`, `▸`/`>`, `✓`/`[x]`, `☐`/`[ ]`. | Status: done
 
 ### 1.4 Word Wrapping (`src/wrap.ts`)
 
-- [ ] **Implement basic word wrapping** — Wrap text to a given width, breaking at word boundaries (spaces). Preserve existing newlines. | Status: not_done
-- [ ] **Handle indentation preservation** — When wrapping text that has a leading indent, continuation lines should preserve the same indent level. | Status: not_done
-- [ ] **Exempt code blocks from wrapping** — Code block content must never be word-wrapped; lines overflow the terminal width. | Status: not_done
-- [ ] **Handle ANSI-aware width calculation** — When calculating line width for wrapping, ignore ANSI escape sequences (they are zero-width). | Status: not_done
+- [x] **Implement basic word wrapping** — Wrap text to a given width, breaking at word boundaries (spaces). Preserve existing newlines. | Status: done
+- [x] **Handle indentation preservation** — When wrapping text that has a leading indent, continuation lines should preserve the same indent level. | Status: done
+- [x] **Exempt code blocks from wrapping** — Code block content must never be word-wrapped; lines overflow the terminal width. | Status: done
+- [x] **Handle ANSI-aware width calculation** — When calculating line width for wrapping, ignore ANSI escape sequences (they are zero-width). | Status: done
 
 ---
 
