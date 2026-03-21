@@ -1,6 +1,6 @@
 {
   "name": "ai-terminal-md",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Terminal renderer optimized for AI markdown patterns",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
