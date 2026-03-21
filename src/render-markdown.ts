@@ -1,9 +1,10 @@
 import { Marked, type Tokens } from 'marked';
-import type { Theme, Style } from './types';
+import type { Theme, Style, CustomHighlighter } from './types';
 import type { ColorLevel } from './ansi';
 import { applyStyle, stripAnsi, visibleLength } from './ansi';
 import { getBoxChars, type BoxChars } from './terminal';
 import { wordWrap } from './wrap';
+import { highlightWithFallback } from './highlighter';
 
 /** Fully resolved renderer configuration with no optional values. */
 export interface ResolvedConfig {
@@ -20,6 +21,7 @@ export interface ResolvedConfig {
   codePadding: number;
   showLinkUrls: boolean;
   tableStyle: 'unicode' | 'ascii' | 'none';
+  highlighter?: CustomHighlighter;
 }
 
 /** Unescape HTML entities that marked may leave in token text. */
@@ -49,6 +51,50 @@ function getOrderedLabel(index: number, depth: number): string {
   }
   // Sub-items use a, b, c, etc.
   return String.fromCharCode(97 + (index % 26)) + '.';
+}
+
+/** Map a TokenCategory to the corresponding Theme style key. */
+function categoryToStyle(category: import('./types').TokenCategory, theme: Theme): Style {
+  switch (category) {
+    case 'keyword': return theme.syntaxKeyword;
+    case 'string': return theme.syntaxString;
+    case 'number': return theme.syntaxNumber;
+    case 'comment': return theme.syntaxComment;
+    case 'operator': return theme.syntaxOperator;
+    case 'type': return theme.syntaxType;
+    case 'function': return theme.syntaxFunction;
+    case 'variable': return theme.syntaxVariable;
+    case 'constant': return theme.syntaxConstant;
+    case 'punctuation': return theme.syntaxPunctuation;
+    case 'attribute': return theme.syntaxAttribute;
+    case 'tag': return theme.syntaxTag;
+    case 'property': return theme.syntaxProperty;
+    case 'plain': return {};
+  }
+}
+
+/** Apply syntax highlighting to a single line of code. */
+function highlightLine(
+  line: string,
+  lang: string,
+  theme: Theme,
+  colorLevel: ColorLevel,
+  customHighlighter?: import('./types').CustomHighlighter,
+): string {
+  if (!lang) return line;
+
+  const tokens = highlightWithFallback(line, lang, customHighlighter);
+
+  // If the entire result is a single plain token, no highlighting was applied
+  if (tokens.length === 1 && tokens[0].category === 'plain') {
+    return line;
+  }
+
+  return tokens.map(token => {
+    if (token.category === 'plain') return token.text;
+    const style = categoryToStyle(token.category, theme);
+    return applyStyle(token.text, style, colorLevel);
+  }).join('');
 }
 
 /** Render a code block with background, language label, optional line numbers, and padding. */
@@ -87,7 +133,10 @@ function renderCodeBlock(
       const num = String(i + 1).padStart(lineNumWidth, ' ');
       lineContent += applyStyle(num, theme.codeLineNumber, colorLevel) + ' ';
     }
-    lineContent += pad + line;
+
+    // Apply syntax highlighting to the line content
+    const highlightedLine = highlightLine(line, lang, theme, colorLevel, config.highlighter);
+    lineContent += pad + highlightedLine;
 
     if (config.codeBackground && theme.codeBackground.bg) {
       // Pad to full width for background fill

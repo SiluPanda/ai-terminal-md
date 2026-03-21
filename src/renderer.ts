@@ -35,6 +35,7 @@ export function resolveConfig(config?: RendererConfig): ResolvedConfig {
     codePadding: config?.codePadding ?? 1,
     showLinkUrls: config?.showLinkUrls !== false,
     tableStyle: config?.tableStyle ?? 'unicode',
+    highlighter: config?.highlighter,
   };
 }
 
