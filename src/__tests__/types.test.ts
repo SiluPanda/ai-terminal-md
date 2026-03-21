@@ -143,9 +143,17 @@ describe('types', () => {
   });
 
   describe('StreamState', () => {
-    it('has readonly _internal field', () => {
-      const state: StreamState = { _internal: { buffer: '' } };
-      expect(state._internal).toBeDefined();
+    it('has buffer, openCodeBlock, codeLang, openThinkingBlock fields', () => {
+      const state: StreamState = {
+        buffer: '',
+        openCodeBlock: false,
+        codeLang: '',
+        openThinkingBlock: false,
+      };
+      expect(state.buffer).toBe('');
+      expect(state.openCodeBlock).toBe(false);
+      expect(state.codeLang).toBe('');
+      expect(state.openThinkingBlock).toBe(false);
     });
   });
 

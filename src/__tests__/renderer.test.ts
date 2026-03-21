@@ -53,20 +53,28 @@ describe('renderer', () => {
       expect(Object.isFrozen(renderer.config)).toBe(true);
     });
 
-    it('renderStream throws not implemented', () => {
+    it('renderStream returns an async iterable', () => {
       const renderer = createRenderer();
       const stream = (async function* () { yield 'test'; })();
-      expect(() => renderer.renderStream(stream)).toThrow('not yet implemented');
+      const result = renderer.renderStream(stream);
+      expect(result).toBeDefined();
+      expect(typeof result[Symbol.asyncIterator]).toBe('function');
     });
 
-    it('renderChunk throws not implemented', () => {
-      const renderer = createRenderer();
-      expect(() => renderer.renderChunk('test')).toThrow('not yet implemented');
+    it('renderChunk returns output and state', () => {
+      const renderer = createRenderer({ colorLevel: 'none', width: 80 });
+      const { output, state } = renderer.renderChunk('Hello world\n\n');
+      expect(typeof output).toBe('string');
+      expect(state).toBeDefined();
+      expect(typeof state.buffer).toBe('string');
+      expect(typeof state.openCodeBlock).toBe('boolean');
     });
 
-    it('flush throws not implemented', () => {
-      const renderer = createRenderer();
-      expect(() => renderer.flush({ _internal: null })).toThrow('not yet implemented');
+    it('flush returns a string', () => {
+      const renderer = createRenderer({ colorLevel: 'none', width: 80 });
+      const state = { buffer: 'remaining text', openCodeBlock: false, codeLang: '', openThinkingBlock: false };
+      const result = renderer.flush(state);
+      expect(typeof result).toBe('string');
     });
   });
 
