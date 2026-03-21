@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { tokenize, highlight, highlightWithFallback, type TokenPattern } from '../highlighter';
 import { tokenizeJavaScript, tokenizeTypeScript } from '../languages/javascript';
+import { tokenizePython } from '../languages/python';
+import { tokenizeJSON } from '../languages/data';
 import { getLanguageTokenizer, isLanguageSupported } from '../languages/index';
 import type { CustomHighlighter } from '../types';
 import { renderMarkdown, type ResolvedConfig } from '../render-markdown';
@@ -469,4 +471,192 @@ describe('code block rendering with syntax highlighting', () => {
     expect(plain).toContain('2');
     expect(plain).toContain('const a = 1;');
   });
+});
+
+// ── Python Tokenizer Tests ────────────────────────────────────────
+
+describe('Python tokenizer', () => {
+  it('highlights def keyword', () => {
+    const tokens = tokenizePython('def foo():');
+    expect(tokens.find(t => t.text === 'def')!.category).toBe('keyword');
+  });
+
+  it('highlights class keyword', () => {
+    const tokens = tokenizePython('class Foo:');
+    expect(tokens.find(t => t.text === 'class')!.category).toBe('keyword');
+  });
+
+  it('highlights import keyword', () => {
+    const tokens = tokenizePython('import os');
+    expect(tokens.find(t => t.text === 'import')!.category).toBe('keyword');
+  });
+
+  it('highlights from/import together', () => {
+    const tokens = tokenizePython('from os import path');
+    expect(tokens.find(t => t.text === 'from')!.category).toBe('keyword');
+    expect(tokens.find(t => t.text === 'import')!.category).toBe('keyword');
+  });
+
+  it('highlights triple-double-quoted strings', () => {
+    const tokens = tokenizePython('"""hello\nworld"""');
+    const str = tokens.find(t => t.category === 'string');
+    expect(str).toBeDefined();
+    expect(str!.text).toBe('"""hello\nworld"""');
+  });
+
+  it('highlights triple-single-quoted strings', () => {
+    const tokens = tokenizePython("'''docstring'''");
+    const str = tokens.find(t => t.category === 'string');
+    expect(str).toBeDefined();
+    expect(str!.text).toBe("'''docstring'''");
+  });
+
+  it('highlights f-string prefix with triple quotes', () => {
+    const tokens = tokenizePython('f"""hello {name}"""');
+    const str = tokens.find(t => t.category === 'string');
+    expect(str).toBeDefined();
+  });
+
+  it('highlights decorators as attributes', () => {
+    const tokens = tokenizePython('@staticmethod\ndef foo(): pass');
+    const attr = tokens.find(t => t.category === 'attribute');
+    expect(attr).toBeDefined();
+    expect(attr!.text).toBe('@staticmethod');
+  });
+
+  it('highlights dotted decorators as attributes', () => {
+    const tokens = tokenizePython('@app.route("/")');
+    const attr = tokens.find(t => t.category === 'attribute');
+    expect(attr).toBeDefined();
+    expect(attr!.text).toBe('@app.route');
+  });
+
+  it('highlights True/False/None as constants', () => {
+    const tokens = tokenizePython('x = True\ny = False\nz = None');
+    const consts = tokens.filter(t => t.category === 'constant').map(t => t.text);
+    expect(consts).toContain('True');
+    expect(consts).toContain('False');
+    expect(consts).toContain('None');
+  });
+
+  it('highlights comments', () => {
+    const tokens = tokenizePython('x = 1  # this is a comment');
+    const comment = tokens.find(t => t.category === 'comment');
+    expect(comment).toBeDefined();
+    expect(comment!.text).toBe('# this is a comment');
+  });
+
+  it('preserves original text when tokens are joined', () => {
+    const code = 'def add(a, b):\n    return a + b\n';
+    const tokens = tokenizePython(code);
+    expect(tokens.map(t => t.text).join('')).toBe(code);
+  });
+});
+
+// ── JSON Tokenizer Tests ──────────────────────────────────────────
+
+describe('JSON tokenizer', () => {
+  it('highlights keys as property (distinct from string values)', () => {
+    const tokens = tokenizeJSON('{"name": "Alice"}');
+    const key = tokens.find(t => t.text === '"name"');
+    expect(key).toBeDefined();
+    expect(key!.category).toBe('property');
+  });
+
+  it('highlights string values as string', () => {
+    const tokens = tokenizeJSON('{"name": "Alice"}');
+    const val = tokens.find(t => t.text === '"Alice"');
+    expect(val).toBeDefined();
+    expect(val!.category).toBe('string');
+  });
+
+  it('highlights numeric values as number', () => {
+    const tokens = tokenizeJSON('{"count": 42}');
+    const num = tokens.find(t => t.category === 'number');
+    expect(num).toBeDefined();
+    expect(num!.text).toBe('42');
+  });
+
+  it('highlights negative numbers', () => {
+    const tokens = tokenizeJSON('{"temp": -3.14}');
+    const num = tokens.find(t => t.category === 'number');
+    expect(num).toBeDefined();
+    expect(num!.text).toBe('-3.14');
+  });
+
+  it('highlights true as constant', () => {
+    const tokens = tokenizeJSON('{"ok": true}');
+    const c = tokens.find(t => t.text === 'true');
+    expect(c).toBeDefined();
+    expect(c!.category).toBe('constant');
+  });
+
+  it('highlights false as constant', () => {
+    const tokens = tokenizeJSON('{"ok": false}');
+    const c = tokens.find(t => t.text === 'false');
+    expect(c).toBeDefined();
+    expect(c!.category).toBe('constant');
+  });
+
+  it('highlights null as constant', () => {
+    const tokens = tokenizeJSON('{"x": null}');
+    const c = tokens.find(t => t.text === 'null');
+    expect(c).toBeDefined();
+    expect(c!.category).toBe('constant');
+  });
+
+  it('keys and values have different categories', () => {
+    const tokens = tokenizeJSON('{"key": "value"}');
+    const key = tokens.find(t => t.text === '"key"');
+    const val = tokens.find(t => t.text === '"value"');
+    expect(key!.category).not.toBe(val!.category);
+    expect(key!.category).toBe('property');
+    expect(val!.category).toBe('string');
+  });
+
+  it('preserves original text when tokens are joined', () => {
+    const code = '{"a": 1, "b": true, "c": null}';
+    const tokens = tokenizeJSON(code);
+    expect(tokens.map(t => t.text).join('')).toBe(code);
+  });
+});
+
+// ── Smoke Tests: All 16 Language Tokenizers ───────────────────────
+
+describe('language tokenizer smoke tests', () => {
+  const cases: Array<{ tag: string; sample: string }> = [
+    { tag: 'javascript', sample: 'const x = 1; // js' },
+    { tag: 'typescript', sample: 'interface Foo { bar: string }' },
+    { tag: 'python',     sample: 'def foo(): pass' },
+    { tag: 'rust',       sample: 'fn main() { let x = 1; }' },
+    { tag: 'go',         sample: 'func main() { var x int = 1 }' },
+    { tag: 'java',       sample: 'public class Foo { void bar() {} }' },
+    { tag: 'ruby',       sample: 'def foo; end' },
+    { tag: 'shell',      sample: 'if [ -f file ]; then echo ok; fi' },
+    { tag: 'sql',        sample: 'SELECT id FROM users WHERE active = true' },
+    { tag: 'html',       sample: '<div class="foo">hello</div>' },
+    { tag: 'css',        sample: '.foo { color: red; }' },
+    { tag: 'json',       sample: '{"key": "value", "n": 1}' },
+    { tag: 'yaml',       sample: 'name: Alice\nage: 30' },
+    { tag: 'markdown',   sample: '# Header\n**bold** and `code`' },
+    { tag: 'c',          sample: '#include <stdio.h>\nint main() { return 0; }' },
+    { tag: 'php',        sample: '<?php function foo() { return 1; }' },
+  ];
+
+  for (const { tag, sample } of cases) {
+    it(`${tag}: produces at least one non-plain token`, () => {
+      const tokenizer = getLanguageTokenizer(tag);
+      expect(tokenizer, `no tokenizer found for ${tag}`).toBeDefined();
+      const tokens = tokenizer!(sample);
+      expect(tokens.length).toBeGreaterThan(0);
+      const hasNonPlain = tokens.some(t => t.category !== 'plain');
+      expect(hasNonPlain, `all tokens are plain for ${tag}`).toBe(true);
+    });
+
+    it(`${tag}: joined tokens reconstruct original input`, () => {
+      const tokenizer = getLanguageTokenizer(tag)!;
+      const tokens = tokenizer(sample);
+      expect(tokens.map(t => t.text).join('')).toBe(sample);
+    });
+  }
 });
