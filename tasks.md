@@ -2,12 +2,12 @@
 
 ## Phase 0: Project Scaffolding and Setup
 
-- [ ] **Install runtime dependencies** — Add `marked` as a runtime dependency in package.json. This is the only runtime dep (CommonMark markdown parser). | Status: not_done
-- [ ] **Install dev dependencies** — Add `typescript`, `vitest`, `eslint`, `@types/node` as dev dependencies in package.json. | Status: not_done
-- [ ] **Configure ESLint** — Create `.eslintrc` or `eslint.config.*` with TypeScript support for the `src/` directory. | Status: not_done
-- [ ] **Create directory structure** — Create `src/languages/` and `src/__tests__/fixtures/` directories to match the file structure defined in the spec (section 18). | Status: not_done
-- [ ] **Add CLI bin entry to package.json** — Add `"bin": { "ai-terminal-md": "dist/cli.js" }` to package.json so the CLI binary is available after global install. | Status: not_done
-- [ ] **Verify build pipeline** — Run `npm run build`, `npm run lint`, and `npm run test` to confirm the toolchain works with the empty project before writing any logic. | Status: not_done
+- [x] **Install runtime dependencies** — Add `marked` as a runtime dependency in package.json. This is the only runtime dep (CommonMark markdown parser). | Status: done
+- [x] **Install dev dependencies** — Add `typescript`, `vitest`, `eslint`, `@types/node` as dev dependencies in package.json. | Status: done
+- [x] **Configure ESLint** — Create `.eslintrc` or `eslint.config.*` with TypeScript support for the `src/` directory. | Status: done
+- [x] **Create directory structure** — Create `src/languages/` and `src/__tests__/fixtures/` directories to match the file structure defined in the spec (section 18). | Status: done
+- [x] **Add CLI bin entry to package.json** — Add `"bin": { "ai-terminal-md": "dist/cli.js" }` to package.json so the CLI binary is available after global install. | Status: done
+- [x] **Verify build pipeline** — Run `npm run build`, `npm run lint`, and `npm run test` to confirm the toolchain works with the empty project before writing any logic. | Status: done
 
 ---
 
@@ -15,25 +15,25 @@
 
 ### 1.1 TypeScript Types (`src/types.ts`)
 
-- [ ] **Define `Style` interface** — Define the `Style` interface with optional fields: `fg`, `bg`, `bold`, `dim`, `italic`, `underline`, `strikethrough`. | Status: not_done
-- [ ] **Define `Theme` interface** — Define the `Theme` interface with all element style keys: headings (1-6), headingUnderline, body, bold, italic, strikethrough, link, linkUrl, code styles (codeBackground, codeLanguageLabel, codeLineNumber, inlineCode), syntax highlighting styles (syntaxKeyword, syntaxString, syntaxNumber, syntaxComment, syntaxOperator, syntaxType, syntaxFunction, syntaxVariable, syntaxConstant, syntaxPunctuation, syntaxAttribute, syntaxTag, syntaxProperty), block styles (blockquoteBorder, blockquoteText, horizontalRule, listBullet, listNumber, tableBorder, tableHeader), and AI element styles (thinkingHeader, thinkingBorder, thinkingText, artifactBorder, artifactTitle, toolUseBorder, toolUseHeader, toolUseKey, toolUseValue, toolResultBorder, toolResultHeader, toolResultSuccess, toolResultError, citation, semanticLabel). | Status: not_done
-- [ ] **Define `ThemeName` type** — Define `type ThemeName = 'dark' | 'light' | 'minimal' | 'monochrome'`. | Status: not_done
-- [ ] **Define `RendererConfig` interface** — Define the full configuration interface with all options: theme, width, colorLevel, unicode, thinking, artifacts, toolUse, toolResult, semanticWrappers, citations, codeBackground, codeLineNumbers, codeLanguageLabel, codePadding, highlighter, tableStyle, showLinkUrls, wordWrap, margin. Include JSDoc for each field with default values. | Status: not_done
-- [ ] **Define `RenderOptions` interface** — Define `RenderOptions` extending `RendererConfig` (identical but separate type for API clarity). | Status: not_done
-- [ ] **Define `AITerminalRenderer` interface** — Define the public renderer interface with methods: `render(markdown: string): string`, `renderStream(stream: AsyncIterable<string>): AsyncIterable<string>`, `renderChunk(chunk: string, state?: StreamState): { output: string; state: StreamState }`, `flush(state: StreamState): string`, and `readonly config: Readonly<RendererConfig>`. | Status: not_done
-- [ ] **Define `StreamState` interface** — Define the opaque `StreamState` interface with `readonly _internal: unknown`. | Status: not_done
-- [ ] **Define `TokenCategory` type** — Define `type TokenCategory = 'keyword' | 'string' | 'number' | 'comment' | 'operator' | 'type' | 'function' | 'variable' | 'constant' | 'punctuation' | 'attribute' | 'tag' | 'property' | 'plain'`. | Status: not_done
-- [ ] **Define `HighlightToken` interface** — Define with `text: string` and `category: TokenCategory`. | Status: not_done
-- [ ] **Define `CustomHighlighter` interface** — Define with `highlight(code: string, language: string): HighlightToken[]`. | Status: not_done
+- [x] **Define `Style` interface** — Define the `Style` interface with optional fields: `fg`, `bg`, `bold`, `dim`, `italic`, `underline`, `strikethrough`. | Status: done
+- [x] **Define `Theme` interface** — Define the `Theme` interface with all element style keys: headings (1-6), headingUnderline, body, bold, italic, strikethrough, link, linkUrl, code styles (codeBackground, codeLanguageLabel, codeLineNumber, inlineCode), syntax highlighting styles (syntaxKeyword, syntaxString, syntaxNumber, syntaxComment, syntaxOperator, syntaxType, syntaxFunction, syntaxVariable, syntaxConstant, syntaxPunctuation, syntaxAttribute, syntaxTag, syntaxProperty), block styles (blockquoteBorder, blockquoteText, horizontalRule, listBullet, listNumber, tableBorder, tableHeader), and AI element styles (thinkingHeader, thinkingBorder, thinkingText, artifactBorder, artifactTitle, toolUseBorder, toolUseHeader, toolUseKey, toolUseValue, toolResultBorder, toolResultHeader, toolResultSuccess, toolResultError, citation, semanticLabel). | Status: done
+- [x] **Define `ThemeName` type** — Define `type ThemeName = 'dark' | 'light' | 'minimal' | 'monochrome'`. | Status: done
+- [x] **Define `RendererConfig` interface** — Define the full configuration interface with all options: theme, width, colorLevel, unicode, thinking, artifacts, toolUse, toolResult, semanticWrappers, citations, codeBackground, codeLineNumbers, codeLanguageLabel, codePadding, highlighter, tableStyle, showLinkUrls, wordWrap, margin. Include JSDoc for each field with default values. | Status: done
+- [x] **Define `RenderOptions` interface** — Define `RenderOptions` extending `RendererConfig` (identical but separate type for API clarity). | Status: done
+- [x] **Define `AITerminalRenderer` interface** — Define the public renderer interface with methods: `render(markdown: string): string`, `renderStream(stream: AsyncIterable<string>): AsyncIterable<string>`, `renderChunk(chunk: string, state?: StreamState): { output: string; state: StreamState }`, `flush(state: StreamState): string`, and `readonly config: Readonly<RendererConfig>`. | Status: done
+- [x] **Define `StreamState` interface** — Define the opaque `StreamState` interface with `readonly _internal: unknown`. | Status: done
+- [x] **Define `TokenCategory` type** — Define `type TokenCategory = 'keyword' | 'string' | 'number' | 'comment' | 'operator' | 'type' | 'function' | 'variable' | 'constant' | 'punctuation' | 'attribute' | 'tag' | 'property' | 'plain'`. | Status: done
+- [x] **Define `HighlightToken` interface** — Define with `text: string` and `category: TokenCategory`. | Status: done
+- [x] **Define `CustomHighlighter` interface** — Define with `highlight(code: string, language: string): HighlightToken[]`. | Status: done
 
 ### 1.2 ANSI Escape Code Generation (`src/ansi.ts`)
 
-- [ ] **Implement 16-color foreground/background** — Write functions to generate ANSI escape sequences for the 16 standard terminal colors (black, red, green, yellow, blue, magenta, cyan, white and their bright variants) for both foreground and background. | Status: not_done
-- [ ] **Implement 256-color support** — Write functions to generate `\x1b[38;5;Nm` (fg) and `\x1b[48;5;Nm` (bg) sequences for 256-color palette indices. | Status: not_done
-- [ ] **Implement truecolor (24-bit RGB) support** — Write functions to generate `\x1b[38;2;R;G;Bm` (fg) and `\x1b[48;2;R;G;Bm` (bg) sequences from hex color strings like `#FF6B6B`. | Status: not_done
-- [ ] **Implement text attribute sequences** — Write functions for bold (`\x1b[1m`), dim (`\x1b[2m`), italic (`\x1b[3m`), underline (`\x1b[4m`), strikethrough (`\x1b[9m`), and reset (`\x1b[0m`). | Status: not_done
-- [ ] **Implement `applyStyle(text, style, colorLevel)` function** — Given text, a `Style` object, and the current color level, generate the correctly wrapped ANSI string. Handle color level downgrade (e.g., skip color codes when `colorLevel` is `'none'`, map truecolor to 256 when needed). | Status: not_done
-- [ ] **Implement `stripAnsi(str)` utility** — Remove all ANSI escape codes from a string using a regex. This is needed for non-TTY output and for test helpers. | Status: not_done
+- [x] **Implement 16-color foreground/background** — Write functions to generate ANSI escape sequences for the 16 standard terminal colors (black, red, green, yellow, blue, magenta, cyan, white and their bright variants) for both foreground and background. | Status: done
+- [x] **Implement 256-color support** — Write functions to generate `\x1b[38;5;Nm` (fg) and `\x1b[48;5;Nm` (bg) sequences for 256-color palette indices. | Status: done
+- [x] **Implement truecolor (24-bit RGB) support** — Write functions to generate `\x1b[38;2;R;G;Bm` (fg) and `\x1b[48;2;R;G;Bm` (bg) sequences from hex color strings like `#FF6B6B`. | Status: done
+- [x] **Implement text attribute sequences** — Write functions for bold (`\x1b[1m`), dim (`\x1b[2m`), italic (`\x1b[3m`), underline (`\x1b[4m`), strikethrough (`\x1b[9m`), and reset (`\x1b[0m`). | Status: done
+- [x] **Implement `applyStyle(text, style, colorLevel)` function** — Given text, a `Style` object, and the current color level, generate the correctly wrapped ANSI string. Handle color level downgrade (e.g., skip color codes when `colorLevel` is `'none'`, map truecolor to 256 when needed). | Status: done
+- [x] **Implement `stripAnsi(str)` utility** — Remove all ANSI escape codes from a string using a regex. This is needed for non-TTY output and for test helpers. | Status: done
 
 ### 1.3 Terminal Capability Detection (`src/terminal.ts`)
 
