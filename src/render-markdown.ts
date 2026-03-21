@@ -1,7 +1,7 @@
 import { Marked, type Tokens } from 'marked';
 import type { Theme, Style } from './types';
 import type { ColorLevel } from './ansi';
-import { applyStyle, stripAnsi } from './ansi';
+import { applyStyle, stripAnsi, visibleLength } from './ansi';
 import { getBoxChars, type BoxChars } from './terminal';
 import { wordWrap } from './wrap';
 
@@ -13,6 +13,7 @@ export interface ResolvedConfig {
   unicode: boolean;
   wordWrapEnabled: boolean;
   margin: number;
+  nonTTY: boolean;
   codeBackground: boolean;
   codeLineNumbers: boolean;
   codeLanguageLabel: boolean;
@@ -191,6 +192,136 @@ function renderList(
   return body;
 }
 
+/** Pad a string to a target width respecting alignment. */
+function alignText(text: string, width: number, alignment: 'left' | 'center' | 'right'): string {
+  const len = visibleLength(text);
+  const padding = Math.max(width - len, 0);
+  switch (alignment) {
+    case 'right':
+      return ' '.repeat(padding) + text;
+    case 'center': {
+      const left = Math.floor(padding / 2);
+      const right = padding - left;
+      return ' '.repeat(left) + text + ' '.repeat(right);
+    }
+    default:
+      return text + ' '.repeat(padding);
+  }
+}
+
+/** Render a table with box-drawing borders, auto-sized columns, and bold headers. */
+function renderTable(
+  token: Tokens.Table,
+  config: ResolvedConfig,
+  theme: Theme,
+  colorLevel: ColorLevel,
+  box: BoxChars,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ctx: { parser: any },
+): string {
+  if (config.tableStyle === 'none') {
+    // Render without borders — just aligned text
+    const headerTexts = token.header.map(cell => ctx.parser.parseInline(cell.tokens));
+    const rowTexts = token.rows.map(row =>
+      row.map(cell => ctx.parser.parseInline(cell.tokens)),
+    );
+
+    // Calculate column widths
+    const colCount = headerTexts.length;
+    const colWidths: number[] = [];
+    for (let c = 0; c < colCount; c++) {
+      let max = visibleLength(headerTexts[c]);
+      for (const row of rowTexts) {
+        if (c < row.length) {
+          max = Math.max(max, visibleLength(row[c]));
+        }
+      }
+      colWidths.push(max);
+    }
+
+    const alignments = token.header.map(cell => cell.align || 'left');
+
+    const lines: string[] = [];
+    // Header
+    const headerCols = headerTexts.map((text, c) =>
+      applyStyle(alignText(text, colWidths[c], alignments[c] as 'left' | 'center' | 'right'), theme.tableHeader, colorLevel),
+    );
+    lines.push(headerCols.join('  '));
+
+    // Body rows
+    for (const row of rowTexts) {
+      const cols = row.map((text, c) =>
+        alignText(text, colWidths[c], alignments[c] as 'left' | 'center' | 'right'),
+      );
+      lines.push(cols.join('  '));
+    }
+
+    return '\n' + lines.join('\n') + '\n\n';
+  }
+
+  // Unicode or ASCII table with box-drawing borders
+  // tableStyle 'ascii' forces ASCII regardless of config.unicode
+  const tableBox = config.tableStyle === 'ascii' ? getBoxChars(false) : box;
+
+  const headerTexts = token.header.map(cell => ctx.parser.parseInline(cell.tokens));
+  const rowTexts = token.rows.map(row =>
+    row.map(cell => ctx.parser.parseInline(cell.tokens)),
+  );
+
+  const colCount = headerTexts.length;
+  const colWidths: number[] = [];
+  for (let c = 0; c < colCount; c++) {
+    let max = visibleLength(headerTexts[c]);
+    for (const row of rowTexts) {
+      if (c < row.length) {
+        max = Math.max(max, visibleLength(row[c]));
+      }
+    }
+    colWidths.push(max);
+  }
+
+  const alignments = token.header.map(cell => cell.align || 'left');
+
+  const h = tableBox.horizontal;
+  const v = applyStyle(tableBox.vertical, theme.tableBorder, colorLevel);
+
+  // Build border lines
+  function borderLine(left: string, mid: string, right: string): string {
+    const segments = colWidths.map(w => h.repeat(w + 2));
+    return applyStyle(left + segments.join(mid) + right, theme.tableBorder, colorLevel);
+  }
+
+  const topBorder = borderLine(tableBox.topLeft, tableBox.topTee, tableBox.topRight);
+  const midBorder = borderLine(tableBox.leftTee, tableBox.cross, tableBox.rightTee);
+  const bottomBorder = borderLine(tableBox.bottomLeft, tableBox.bottomTee, tableBox.bottomRight);
+
+  const lines: string[] = [];
+  lines.push(topBorder);
+
+  // Header row
+  const headerCols = headerTexts.map((text, c) => {
+    const aligned = alignText(text, colWidths[c], alignments[c] as 'left' | 'center' | 'right');
+    return ' ' + applyStyle(aligned, theme.tableHeader, colorLevel) + ' ';
+  });
+  lines.push(v + headerCols.join(v) + v);
+
+  // Header-body separator
+  lines.push(midBorder);
+
+  // Body rows
+  for (const row of rowTexts) {
+    const cols = row.map((text, c) => {
+      const aligned = alignText(text, colWidths[c], alignments[c] as 'left' | 'center' | 'right');
+      return ' ' + aligned + ' ';
+    });
+    lines.push(v + cols.join(v) + v);
+  }
+
+  lines.push(bottomBorder);
+
+  return '\n' + lines.join('\n') + '\n\n';
+}
+
 /** Create a configured Marked instance with our ANSI terminal renderer. */
 export function createMarkdownRenderer(config: ResolvedConfig): Marked {
   const { theme, colorLevel } = config;
@@ -301,9 +432,8 @@ export function createMarkdownRenderer(config: ResolvedConfig): Marked {
         return '\n' + applyStyle(line, theme.horizontalRule, colorLevel) + '\n\n';
       },
 
-      table(): string {
-        // Tables will be implemented in a later phase
-        return '';
+      table(token: Tokens.Table): string {
+        return renderTable(token, config, theme, colorLevel, box, this);
       },
 
       tablerow({ text }: Tokens.TableRow): string {
@@ -359,8 +489,24 @@ export function renderMarkdown(markdown: string, config: ResolvedConfig): string
     throw new Error('Async rendering not supported');
   }
   // Clean up excessive blank lines and trim edges
-  return result
+  let output = result
     .replace(/\n{3,}/g, '\n\n')
     .replace(/^\n+/, '')
     .replace(/\n{2,}$/, '\n');
+
+  // Apply left margin to all lines
+  if (config.margin > 0) {
+    const marginStr = ' '.repeat(config.margin);
+    output = output
+      .split('\n')
+      .map(line => line === '' ? '' : marginStr + line)
+      .join('\n');
+  }
+
+  // Strip ANSI codes for non-TTY output
+  if (config.nonTTY) {
+    output = stripAnsi(output);
+  }
+
+  return output;
 }

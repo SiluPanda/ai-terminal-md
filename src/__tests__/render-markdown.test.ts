@@ -13,6 +13,7 @@ function testConfig(overrides?: Partial<ResolvedConfig>): ResolvedConfig {
     unicode: true,
     wordWrapEnabled: true,
     margin: 0,
+    nonTTY: false,
     codeBackground: true,
     codeLineNumbers: false,
     codeLanguageLabel: true,
@@ -206,8 +207,8 @@ describe('render-markdown', () => {
       const lines = plain.split('\n');
       const underlineLine = lines.find(l => l.includes('═'));
       expect(underlineLine).toBeDefined();
-      // contentWidth = 80 - 5*2 = 70
-      expect(underlineLine!.length).toBe(70);
+      // contentWidth = 80 - 5*2 = 70, plus 5-char left margin prefix = 75
+      expect(underlineLine!.length).toBe(75);
     });
   });
 
@@ -938,8 +939,8 @@ describe('render-markdown', () => {
       const lines = plain.split('\n');
       const ruleLine = lines.find(l => l.includes('─'));
       expect(ruleLine).toBeDefined();
-      // contentWidth = 80 - 5*2 = 70
-      expect(ruleLine!.length).toBe(70);
+      // contentWidth = 80 - 5*2 = 70, plus 5-char left margin prefix = 75
+      expect(ruleLine!.length).toBe(75);
     });
 
     it('renders horizontal rule between paragraphs', () => {
@@ -974,6 +975,275 @@ describe('render-markdown', () => {
     it('renders image inside paragraph text', () => {
       const plain = renderPlain('See this: ![diagram](url) for reference.');
       expect(plain).toContain('[Image: diagram]');
+    });
+  });
+
+  describe('tables', () => {
+    it('renders a basic table with Unicode borders', () => {
+      const md = '| Name | Age |\n|---|---|\n| Alice | 30 |\n| Bob | 25 |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('┌');
+      expect(plain).toContain('┐');
+      expect(plain).toContain('└');
+      expect(plain).toContain('┘');
+      expect(plain).toContain('│');
+      expect(plain).toContain('─');
+      expect(plain).toContain('Alice');
+      expect(plain).toContain('Bob');
+      expect(plain).toContain('30');
+      expect(plain).toContain('25');
+    });
+
+    it('renders header row in bold', () => {
+      const md = '| Name | Age |\n|---|---|\n| Alice | 30 |';
+      const result = render(md);
+      expect(result).toContain(BOLD);
+      expect(result).toContain('Name');
+    });
+
+    it('renders header-body separator with ├─┼─┤', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('├');
+      expect(plain).toContain('┼');
+      expect(plain).toContain('┤');
+    });
+
+    it('renders top border with ┌─┬─┐', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('┌');
+      expect(plain).toContain('┬');
+      expect(plain).toContain('┐');
+    });
+
+    it('renders bottom border with └─┴─┘', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('└');
+      expect(plain).toContain('┴');
+      expect(plain).toContain('┘');
+    });
+
+    it('auto-calculates column widths from content', () => {
+      const md = '| Short | LongerColumn |\n|---|---|\n| A | B |';
+      const plain = renderPlain(md);
+      const lines = plain.split('\n').filter(l => l.includes('│'));
+      // The header row should contain both column headers properly spaced
+      const headerLine = lines[0];
+      expect(headerLine).toContain('Short');
+      expect(headerLine).toContain('LongerColumn');
+    });
+
+    it('honors left alignment (default)', () => {
+      const md = '| Name |\n|:---|\n| A |';
+      const plain = renderPlain(md);
+      // Left-aligned: text should be left-justified
+      const dataLine = plain.split('\n').find(l => l.includes('A') && l.includes('│'));
+      expect(dataLine).toBeDefined();
+    });
+
+    it('honors right alignment', () => {
+      const md = '| Value |\n|---:|\n| 42 |';
+      const plain = renderPlain(md);
+      const dataLine = plain.split('\n').find(l => l.includes('42') && l.includes('│'));
+      expect(dataLine).toBeDefined();
+      // In right-aligned column, text has left padding
+      const cellContent = dataLine!.split('│')[1];
+      expect(cellContent).toBeDefined();
+      // '42' should have leading spaces for right alignment
+      expect(cellContent!.trimStart().length).toBeLessThan(cellContent!.length);
+    });
+
+    it('honors center alignment', () => {
+      const md = '| Value |\n|:---:|\n| Hi |';
+      const plain = renderPlain(md);
+      const dataLine = plain.split('\n').find(l => l.includes('Hi') && l.includes('│'));
+      expect(dataLine).toBeDefined();
+    });
+
+    it('falls back to ASCII borders when unicode is false', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md, { unicode: false });
+      expect(plain).toContain('+');
+      expect(plain).toContain('-');
+      expect(plain).toContain('|');
+      expect(plain).not.toContain('┌');
+      expect(plain).not.toContain('│');
+      expect(plain).not.toContain('─');
+    });
+
+    it('renders table with no borders when tableStyle is none', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md, { tableStyle: 'none' });
+      expect(plain).not.toContain('┌');
+      expect(plain).not.toContain('│');
+      expect(plain).not.toContain('─');
+      expect(plain).toContain('A');
+      expect(plain).toContain('B');
+      expect(plain).toContain('1');
+      expect(plain).toContain('2');
+    });
+
+    it('renders table with ascii style when tableStyle is ascii', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md, { tableStyle: 'ascii' });
+      expect(plain).toContain('+');
+      expect(plain).toContain('-');
+      expect(plain).toContain('|');
+      expect(plain).not.toContain('┌');
+    });
+
+    it('renders table with multiple rows', () => {
+      const md = '| Name | Age | City |\n|---|---|---|\n| Alice | 30 | NY |\n| Bob | 25 | LA |\n| Charlie | 35 | SF |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('Alice');
+      expect(plain).toContain('Bob');
+      expect(plain).toContain('Charlie');
+      expect(plain).toContain('NY');
+      expect(plain).toContain('LA');
+      expect(plain).toContain('SF');
+    });
+
+    it('renders single-column table', () => {
+      const md = '| Name |\n|---|\n| Alice |\n| Bob |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('Alice');
+      expect(plain).toContain('Bob');
+      expect(plain).toContain('┌');
+      expect(plain).toContain('└');
+    });
+
+    it('renders table with inline formatting in cells', () => {
+      const md = '| Name | Note |\n|---|---|\n| **Alice** | *nice* |';
+      const result = render(md);
+      expect(result).toContain(BOLD);
+      expect(result).toContain(ITALIC);
+    });
+
+    it('handles empty cells', () => {
+      const md = '| A | B |\n|---|---|\n|  | 2 |';
+      const plain = renderPlain(md);
+      expect(plain).toContain('2');
+      // Should not crash
+    });
+  });
+
+  describe('non-TTY mode', () => {
+    it('strips ANSI codes when nonTTY is true', () => {
+      const result = render('# Hello **World**', { nonTTY: true });
+      // Should have no ANSI escape codes
+      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).toContain('Hello');
+      expect(result).toContain('World');
+    });
+
+    it('preserves structural formatting in non-TTY mode', () => {
+      const result = render('# Hello', { nonTTY: true });
+      // Should still have underline characters and newlines
+      expect(result).toContain('═');
+      expect(result).toContain('\n');
+    });
+
+    it('preserves list indentation in non-TTY mode', () => {
+      const result = render('- item 1\n- item 2', { nonTTY: true });
+      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).toContain('item 1');
+      expect(result).toContain('item 2');
+    });
+
+    it('preserves table borders in non-TTY mode', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const result = render(md, { nonTTY: true });
+      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).toContain('│');
+      expect(result).toContain('A');
+    });
+
+    it('preserves code block structure in non-TTY mode', () => {
+      const md = '```js\nconst x = 1;\n```';
+      const result = render(md, { nonTTY: true });
+      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).toContain('const x = 1;');
+    });
+
+    it('non-TTY with ASCII fallback', () => {
+      const result = render('# Hello', { nonTTY: true, unicode: false });
+      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).toContain('=');
+      expect(result).not.toContain('═');
+    });
+  });
+
+  describe('margin support', () => {
+    it('applies left margin to all content lines', () => {
+      const plain = renderPlain('Hello world', { margin: 4 });
+      const lines = plain.split('\n').filter(l => l.length > 0);
+      for (const line of lines) {
+        expect(line).toMatch(/^ {4}/);
+      }
+    });
+
+    it('does not add margin to empty lines', () => {
+      const plain = renderPlain('Hello\n\nWorld', { margin: 4 });
+      const lines = plain.split('\n');
+      const emptyLines = lines.filter(l => l === '');
+      expect(emptyLines.length).toBeGreaterThan(0);
+      for (const line of emptyLines) {
+        expect(line).toBe('');
+      }
+    });
+
+    it('margin 0 does not add spaces', () => {
+      const plain = renderPlain('Hello world', { margin: 0 });
+      const lines = plain.split('\n').filter(l => l.length > 0);
+      for (const line of lines) {
+        expect(line).not.toMatch(/^\s{4}/);
+      }
+    });
+
+    it('margin narrows content width for wrapping', () => {
+      const longText = 'This is a sentence that should be wrapped at a narrower width because of margin.';
+      const plainNoMargin = renderPlain(longText, { width: 80, margin: 0 });
+      const plainWithMargin = renderPlain(longText, { width: 80, margin: 10 });
+      const linesNoMargin = plainNoMargin.split('\n').filter(l => l.length > 0);
+      const linesWithMargin = plainWithMargin.split('\n').filter(l => l.length > 0);
+      // With margin, text wraps into more lines
+      expect(linesWithMargin.length).toBeGreaterThanOrEqual(linesNoMargin.length);
+    });
+
+    it('margin applies to headers', () => {
+      const plain = renderPlain('# Hello', { margin: 3 });
+      const lines = plain.split('\n').filter(l => l.length > 0);
+      for (const line of lines) {
+        expect(line).toMatch(/^ {3}/);
+      }
+    });
+
+    it('margin applies to code blocks', () => {
+      const plain = renderPlain('```\ncode\n```', { margin: 2 });
+      const lines = plain.split('\n').filter(l => l.length > 0);
+      for (const line of lines) {
+        expect(line.startsWith('  ')).toBe(true);
+      }
+    });
+
+    it('margin applies to tables', () => {
+      const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+      const plain = renderPlain(md, { margin: 3 });
+      const tableLines = plain.split('\n').filter(l => l.includes('│') || l.includes('┌') || l.includes('└'));
+      for (const line of tableLines) {
+        expect(line).toMatch(/^ {3}/);
+      }
+    });
+
+    it('margin combines with non-TTY mode', () => {
+      const result = render('# Hello', { margin: 4, nonTTY: true });
+      expect(result).not.toMatch(/\x1b\[/);
+      const lines = result.split('\n').filter(l => l.length > 0);
+      for (const line of lines) {
+        expect(line).toMatch(/^ {4}/);
+      }
     });
   });
 

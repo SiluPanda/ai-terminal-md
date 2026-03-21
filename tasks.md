@@ -88,7 +88,7 @@
 - [x] **Render task lists** — `[x]` renders as green `✓`, `[ ]` renders as dim `☐`. ASCII fallback: `[x]` and `[ ]`. | Status: done
 - [x] **Render links** — Link text underlined, URL in parentheses dimmed (when `showLinkUrls` is true). Bare URLs displayed once, underlined. | Status: done
 - [x] **Render blockquotes** — Left border with `│` in dim color. Text dimmed. Two-space indent. Nested blockquotes add additional `│` with space separator. | Status: done
-- [ ] **Render tables** — Box-drawing borders (Unicode by default, ASCII fallback). Auto-calculated column widths. Bold header row. Honor alignment syntax (`:---`, `:---:`, `---:`). Separator between header and body with `├─┼─┤`. Configurable via `tableStyle`. | Status: not_done
+- [x] **Render tables** — Box-drawing borders (Unicode by default, ASCII fallback). Auto-calculated column widths. Bold header row. Honor alignment syntax (`:---`, `:---:`, `---:`). Separator between header and body with `├─┼─┤`. Configurable via `tableStyle`. | Status: done
 - [x] **Render horizontal rules** — Full-width line using `─` (or `-` in ASCII mode), dimmed. | Status: done
 - [x] **Render images** — Placeholder text: `[Image: alt text]` in dim italic. If no alt text, render `[Image]`. | Status: done
 
@@ -97,8 +97,8 @@
 - [x] **Implement `AITerminalRenderer` class** — Create the class that holds resolved config (theme, terminal capabilities, all options). Wire up `marked` parsing and the custom markdown renderer. | Status: done
 - [x] **Implement `render(markdown)` method** — Parse markdown with `marked`, apply the custom renderer, return ANSI-formatted string. | Status: done
 - [x] **Implement config resolution** — Merge explicit config options with env var overrides and auto-detected defaults. Priority: explicit config > env vars > auto-detected. Handle `AI_TERMINAL_MD_THEME`, `AI_TERMINAL_MD_THINKING`, `AI_TERMINAL_MD_WIDTH` env vars. | Status: done
-- [ ] **Implement non-TTY mode** — When `stdout.isTTY` is false, strip all ANSI codes from output. Preserve structural formatting (indentation, line breaks, ASCII borders). | Status: not_done
-- [ ] **Implement margin support** — Apply left margin (configurable number of spaces) to all rendered content. | Status: not_done
+- [x] **Implement non-TTY mode** — When `stdout.isTTY` is false, strip all ANSI codes from output. Preserve structural formatting (indentation, line breaks, ASCII borders). | Status: done
+- [x] **Implement margin support** — Apply left margin (configurable number of spaces) to all rendered content. | Status: done
 
 ### 3.3 Public API (`src/index.ts`)
 
