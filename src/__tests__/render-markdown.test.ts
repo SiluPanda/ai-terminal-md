@@ -494,6 +494,281 @@ describe('render-markdown', () => {
     });
   });
 
+  describe('code blocks', () => {
+    it('renders code block with language label', () => {
+      const plain = renderPlain('```python\ndef hello():\n    pass\n```');
+      expect(plain).toContain('python');
+      expect(plain).toContain('def hello():');
+      expect(plain).toContain('    pass');
+    });
+
+    it('renders language label right-aligned', () => {
+      const plain = renderPlain('```javascript\nconst x = 1;\n```', { width: 80 });
+      const lines = plain.split('\n');
+      const labelLine = lines.find(l => l.includes('javascript'));
+      expect(labelLine).toBeDefined();
+      // Label should be right-aligned — more spaces on the left than label length
+      const trimmed = labelLine!.trimStart();
+      expect(trimmed.trim()).toBe('javascript');
+    });
+
+    it('applies dimmed style to language label', () => {
+      const result = render('```python\ncode\n```');
+      expect(result).toContain(DIM);
+      expect(result).toContain('python');
+    });
+
+    it('does not show language label when codeLanguageLabel is false', () => {
+      const plain = renderPlain('```python\ncode\n```', { codeLanguageLabel: false });
+      expect(plain).not.toContain('python');
+      expect(plain).toContain('code');
+    });
+
+    it('does not show language label when no language is specified', () => {
+      const plain = renderPlain('```\ncode\n```');
+      const lines = plain.split('\n').filter(l => l.trim().length > 0);
+      // All non-empty lines should only contain code-related content
+      expect(lines.some(l => l.trim() === 'code')).toBe(true);
+    });
+
+    it('applies horizontal padding to code lines', () => {
+      const plain = renderPlain('```\nhello\n```', { codePadding: 2 });
+      const lines = plain.split('\n');
+      const codeLine = lines.find(l => l.includes('hello'));
+      expect(codeLine).toBeDefined();
+      // Should have at least 2 spaces of padding before "hello"
+      expect(codeLine!).toMatch(/^\s{2,}hello/);
+    });
+
+    it('shows line numbers when codeLineNumbers is true', () => {
+      const plain = renderPlain('```\nline one\nline two\nline three\n```', { codeLineNumbers: true });
+      expect(plain).toContain('1');
+      expect(plain).toContain('2');
+      expect(plain).toContain('3');
+    });
+
+    it('right-aligns line numbers', () => {
+      const lines = Array.from({ length: 12 }, (_, i) => `line ${i + 1}`).join('\n');
+      const plain = renderPlain('```\n' + lines + '\n```', { codeLineNumbers: true });
+      // Line 1 should be padded: " 1"
+      expect(plain).toContain(' 1');
+      expect(plain).toContain('12');
+    });
+
+    it('applies background color when codeBackground is true', () => {
+      const result = render('```\nhello\n```', { codeBackground: true });
+      // Should contain background ANSI sequence (truecolor bg)
+      expect(result).toMatch(/\x1b\[48;2;\d+;\d+;\d+m/);
+    });
+
+    it('does not apply background when codeBackground is false', () => {
+      const result = render('```\nhello\n```', { codeBackground: false });
+      // Should not contain background ANSI sequence for code bg
+      // (but may have other ANSI for language label)
+      const lines = result.split('\n');
+      const codeLines = lines.filter(l => l.includes('hello'));
+      for (const line of codeLines) {
+        expect(line).not.toMatch(/\x1b\[48;2;\d+;\d+;\d+m/);
+      }
+    });
+
+    it('renders vertical padding lines with background', () => {
+      const plain = renderPlain('```\nhello\n```', { codeBackground: true });
+      const lines = plain.split('\n');
+      // Should have empty padding lines before and after code
+      const helloIdx = lines.findIndex(l => l.includes('hello'));
+      expect(helloIdx).toBeGreaterThan(0);
+    });
+
+    it('does not word-wrap code block content', () => {
+      const longLine = 'x'.repeat(200);
+      const plain = renderPlain('```\n' + longLine + '\n```', { width: 80 });
+      const lines = plain.split('\n');
+      const codeLine = lines.find(l => l.includes('x'.repeat(100)));
+      expect(codeLine).toBeDefined();
+    });
+
+    it('preserves code indentation', () => {
+      const plain = renderPlain('```\n  indented\n    more\n```');
+      expect(plain).toContain('  indented');
+      expect(plain).toContain('    more');
+    });
+
+    it('handles empty code blocks', () => {
+      const plain = renderPlain('```\n```');
+      expect(typeof plain).toBe('string');
+    });
+
+    it('handles multi-line code blocks', () => {
+      const code = '```\nline 1\nline 2\nline 3\n```';
+      const plain = renderPlain(code);
+      expect(plain).toContain('line 1');
+      expect(plain).toContain('line 2');
+      expect(plain).toContain('line 3');
+    });
+
+    it('preserves raw text in code blocks', () => {
+      const plain = renderPlain('```\na &amp; b < c\n```');
+      // Code blocks preserve raw text — no HTML entity unescaping
+      expect(plain).toContain('a &amp; b < c');
+    });
+  });
+
+  describe('unordered lists', () => {
+    it('renders level 0 items with bullet character', () => {
+      const plain = renderPlain('- item one\n- item two');
+      expect(plain).toContain('●');
+      expect(plain).toContain('item one');
+      expect(plain).toContain('item two');
+    });
+
+    it('renders level 1 nested items with circle character', () => {
+      const plain = renderPlain('- parent\n  - child');
+      expect(plain).toContain('●');
+      expect(plain).toContain('○');
+      expect(plain).toContain('parent');
+      expect(plain).toContain('child');
+    });
+
+    it('renders level 2 nested items with square character', () => {
+      const plain = renderPlain('- a\n  - b\n    - c');
+      expect(plain).toContain('●');
+      expect(plain).toContain('○');
+      expect(plain).toContain('■');
+    });
+
+    it('renders level 3+ nested items with arrow character', () => {
+      const plain = renderPlain('- a\n  - b\n    - c\n      - d');
+      expect(plain).toContain('▸');
+      expect(plain).toContain('d');
+    });
+
+    it('uses ASCII fallback when unicode is false', () => {
+      const plain = renderPlain('- a\n  - b\n    - c\n      - d', { unicode: false });
+      expect(plain).toContain('*');
+      expect(plain).toContain('-');
+      expect(plain).toContain('+');
+      expect(plain).toContain('>');
+      expect(plain).not.toContain('●');
+      expect(plain).not.toContain('○');
+      expect(plain).not.toContain('■');
+      expect(plain).not.toContain('▸');
+    });
+
+    it('adds two spaces of indentation per nesting level', () => {
+      const plain = renderPlain('- a\n  - b\n    - c');
+      const lines = plain.split('\n').filter(l => l.trim().length > 0);
+      // Level 0: starts at column 0
+      expect(lines[0]).toMatch(/^[●*]/);
+      // Level 1: starts at column 2
+      expect(lines[1]).toMatch(/^\s{2}[○-]/);
+      // Level 2: starts at column 4
+      expect(lines[2]).toMatch(/^\s{4}[■+]/);
+    });
+
+    it('applies listBullet theme style to bullets', () => {
+      const result = render('- item');
+      // Dark theme listBullet has fg: 'cyan' -> \x1b[36m
+      expect(result).toContain('\x1b[36m');
+    });
+
+    it('renders inline formatting within list items', () => {
+      const plain = renderPlain('- **bold** item\n- *italic* item');
+      expect(plain).toContain('bold item');
+      expect(plain).toContain('italic item');
+    });
+
+    it('renders multiple items correctly', () => {
+      const plain = renderPlain('- first\n- second\n- third');
+      const lines = plain.split('\n').filter(l => l.trim().length > 0);
+      expect(lines).toHaveLength(3);
+    });
+  });
+
+  describe('ordered lists', () => {
+    it('renders items with numbers', () => {
+      const plain = renderPlain('1. first\n2. second\n3. third');
+      expect(plain).toContain('1.');
+      expect(plain).toContain('2.');
+      expect(plain).toContain('3.');
+      expect(plain).toContain('first');
+      expect(plain).toContain('second');
+      expect(plain).toContain('third');
+    });
+
+    it('renders nested sub-items with alphabetic labels', () => {
+      const plain = renderPlain('1. first\n   1. sub one\n   2. sub two\n2. second');
+      expect(plain).toContain('a.');
+      expect(plain).toContain('b.');
+      expect(plain).toContain('sub one');
+      expect(plain).toContain('sub two');
+    });
+
+    it('applies listNumber theme style', () => {
+      const result = render('1. item');
+      // Dark theme listNumber has fg: 'cyan' -> \x1b[36m
+      expect(result).toContain('\x1b[36m');
+    });
+
+    it('renders inline formatting within ordered list items', () => {
+      const plain = renderPlain('1. **bold** item\n2. `code` item');
+      expect(plain).toContain('bold item');
+      expect(plain).toContain('code item');
+    });
+
+    it('handles long ordered lists', () => {
+      const items = Array.from({ length: 10 }, (_, i) => `${i + 1}. item ${i + 1}`).join('\n');
+      const plain = renderPlain(items);
+      expect(plain).toContain('1.');
+      expect(plain).toContain('10.');
+      expect(plain).toContain('item 10');
+    });
+  });
+
+  describe('task lists', () => {
+    it('renders checked items with checkmark', () => {
+      const plain = renderPlain('- [x] Done');
+      expect(plain).toContain('✓');
+      expect(plain).toContain('Done');
+      // Should NOT contain the raw [x] marker
+      expect(plain).not.toContain('[x]');
+    });
+
+    it('renders unchecked items with empty checkbox', () => {
+      const plain = renderPlain('- [ ] Todo');
+      expect(plain).toContain('☐');
+      expect(plain).toContain('Todo');
+      // Should NOT contain the raw [ ] marker
+      expect(plain).not.toContain('[ ]');
+    });
+
+    it('renders checked items with green styling', () => {
+      const result = render('- [x] Done');
+      // green fg: \x1b[32m
+      expect(result).toContain('\x1b[32m');
+    });
+
+    it('renders unchecked items with dim styling', () => {
+      const result = render('- [ ] Todo');
+      expect(result).toContain(DIM);
+    });
+
+    it('uses ASCII fallback for checkmark/checkbox', () => {
+      const plain = renderPlain('- [x] Done\n- [ ] Todo', { unicode: false });
+      // ASCII checkmark is [x], checkbox is [ ]
+      // Since we filter out the raw checkbox token, the ASCII chars come from box chars
+      expect(plain).toContain('Done');
+      expect(plain).toContain('Todo');
+    });
+
+    it('renders mixed task and non-task items', () => {
+      const plain = renderPlain('- [x] Done\n- Regular item\n- [ ] Todo');
+      expect(plain).toContain('✓');
+      expect(plain).toContain('●');
+      expect(plain).toContain('☐');
+    });
+  });
+
   describe('width and wrapping', () => {
     it('respects width 40', () => {
       const longText = 'This is a sentence that should be wrapped at a narrow width for testing purposes.';

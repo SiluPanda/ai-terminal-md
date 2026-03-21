@@ -1,8 +1,8 @@
 import { Marked, type Tokens } from 'marked';
 import type { Theme, Style } from './types';
 import type { ColorLevel } from './ansi';
-import { applyStyle } from './ansi';
-import { getBoxChars } from './terminal';
+import { applyStyle, stripAnsi } from './ansi';
+import { getBoxChars, type BoxChars } from './terminal';
 import { wordWrap } from './wrap';
 
 /** Fully resolved renderer configuration with no optional values. */
@@ -29,6 +29,166 @@ function unescapeHtml(html: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
+}
+
+/** Get the bullet character for a given nesting depth. */
+function getBullet(depth: number, box: BoxChars): string {
+  switch (depth) {
+    case 0: return box.bullet;
+    case 1: return box.circle;
+    case 2: return box.square;
+    default: return box.arrow;
+  }
+}
+
+/** Get the ordered list label for a given index at a given depth. */
+function getOrderedLabel(index: number, depth: number): string {
+  if (depth === 0) {
+    return `${index + 1}.`;
+  }
+  // Sub-items use a, b, c, etc.
+  return String.fromCharCode(97 + (index % 26)) + '.';
+}
+
+/** Render a code block with background, language label, optional line numbers, and padding. */
+function renderCodeBlock(
+  text: string,
+  lang: string,
+  config: ResolvedConfig,
+  theme: Theme,
+  colorLevel: ColorLevel,
+  contentWidth: number,
+): string {
+  const lines = text.split('\n');
+  const pad = ' '.repeat(config.codePadding);
+  const lineCount = lines.length;
+  const lineNumWidth = config.codeLineNumbers ? String(lineCount).length : 0;
+
+  // Build the language label line (right-aligned, dimmed)
+  let langLine = '';
+  if (config.codeLanguageLabel && lang) {
+    const label = applyStyle(lang, theme.codeLanguageLabel, colorLevel);
+    const labelPlain = lang;
+    const spaces = Math.max(contentWidth - labelPlain.length, 0);
+    langLine = ' '.repeat(spaces) + label;
+    if (config.codeBackground) {
+      // Apply background to the full-width language label line
+      const bgLine = ' '.repeat(spaces) + labelPlain;
+      const bgSpaces = Math.max(contentWidth - bgLine.length, 0);
+      langLine = applyStyle(' '.repeat(spaces) + lang + ' '.repeat(bgSpaces), { ...theme.codeLanguageLabel, bg: theme.codeBackground.bg }, colorLevel);
+    }
+  }
+
+  // Build each code line
+  const codeLines = lines.map((line, i) => {
+    let lineContent = '';
+    if (config.codeLineNumbers) {
+      const num = String(i + 1).padStart(lineNumWidth, ' ');
+      lineContent += applyStyle(num, theme.codeLineNumber, colorLevel) + ' ';
+    }
+    lineContent += pad + line;
+
+    if (config.codeBackground && theme.codeBackground.bg) {
+      // Pad to full width for background fill
+      const visLen = stripAnsi(lineContent).length + config.codePadding;
+      const remaining = Math.max(contentWidth - visLen, 0);
+      const fullLine = lineContent + ' '.repeat(remaining + config.codePadding);
+      return applyStyle(fullLine, theme.codeBackground, colorLevel);
+    }
+    return lineContent;
+  });
+
+  // Build the empty padding lines (vertical padding)
+  let emptyLine = '';
+  if (config.codeBackground && theme.codeBackground.bg) {
+    emptyLine = applyStyle(' '.repeat(contentWidth), theme.codeBackground, colorLevel);
+  }
+
+  const parts: string[] = [];
+  if (langLine) parts.push(langLine);
+  if (emptyLine) parts.push(emptyLine);
+  parts.push(...codeLines);
+  if (emptyLine) parts.push(emptyLine);
+
+  return '\n' + parts.join('\n') + '\n\n';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface RendererContext { parser: any }
+
+/** Render a list (ordered or unordered) with proper bullets/numbering and nesting. */
+function renderList(
+  token: Tokens.List,
+  depth: number,
+  config: ResolvedConfig,
+  theme: Theme,
+  colorLevel: ColorLevel,
+  box: BoxChars,
+  ctx: RendererContext,
+): string {
+  let body = '';
+
+  for (let i = 0; i < token.items.length; i++) {
+    const item = token.items[i];
+    const indent = '  '.repeat(depth);
+
+    // Build the bullet or number prefix
+    let prefix: string;
+    if (token.ordered) {
+      const label = getOrderedLabel(i, depth);
+      prefix = applyStyle(label, theme.listNumber, colorLevel);
+    } else {
+      const bullet = getBullet(depth, box);
+      prefix = applyStyle(bullet, theme.listBullet, colorLevel);
+    }
+
+    // Separate list sub-tokens into text tokens and nested list tokens
+    // Filter out checkbox tokens for task items — we handle them separately
+    const textTokens: Tokens.Generic[] = [];
+    const nestedLists: Tokens.List[] = [];
+    for (const t of item.tokens) {
+      if (t.type === 'list') {
+        nestedLists.push(t as Tokens.List);
+      } else if (t.type === 'checkbox' && item.task) {
+        // Skip — handled below with custom check/box characters
+      } else {
+        textTokens.push(t as Tokens.Generic);
+      }
+    }
+
+    // Render the text content of this item
+    let text = ctx.parser.parse(textTokens);
+    // Remove trailing newlines from the parsed text
+    text = text.replace(/\n+$/, '');
+    // For multi-line text, only take the first line for the bullet line
+    const textLines = text.split('\n');
+    const firstLine = textLines[0];
+
+    // Handle task list checkboxes
+    if (item.task) {
+      const checkChar = item.checked
+        ? applyStyle(box.checkmark, { fg: 'green' }, colorLevel)
+        : applyStyle(box.checkbox, { dim: true }, colorLevel);
+      body += indent + checkChar + ' ' + firstLine + '\n';
+    } else {
+      body += indent + prefix + ' ' + firstLine + '\n';
+    }
+
+    // Continuation lines (if multi-line text)
+    const continuationIndent = indent + '  ';
+    for (let j = 1; j < textLines.length; j++) {
+      if (textLines[j].trim() !== '') {
+        body += continuationIndent + textLines[j] + '\n';
+      }
+    }
+
+    // Render nested lists
+    for (const nested of nestedLists) {
+      body += renderList(nested, depth + 1, config, theme, colorLevel, box, ctx);
+    }
+  }
+
+  return body;
 }
 
 /** Create a configured Marked instance with our ANSI terminal renderer. */
@@ -107,13 +267,8 @@ export function createMarkdownRenderer(config: ResolvedConfig): Marked {
       // Stub implementations for elements not yet implemented in this phase.
       // These will be properly implemented in later phases.
 
-      code({ text, lang: _lang }: Tokens.Code): string {
-        // Basic code block — syntax highlighting comes in Phase 4
-        const lines = text.split('\n');
-        const pad = ' '.repeat(config.codePadding);
-        const codeLines = lines.map(line => pad + line);
-        const block = codeLines.join('\n');
-        return '\n' + block + '\n\n';
+      code({ text, lang }: Tokens.Code): string {
+        return renderCodeBlock(text, lang || '', config, theme, colorLevel, contentWidth);
       },
 
       blockquote({ tokens }: Tokens.Blockquote): string {
@@ -125,14 +280,11 @@ export function createMarkdownRenderer(config: ResolvedConfig): Marked {
       },
 
       list(token: Tokens.List): string {
-        let body = '';
-        for (const item of token.items) {
-          body += this.listitem(item);
-        }
-        return body + '\n';
+        return renderList(token, 0, config, theme, colorLevel, box, this);
       },
 
       listitem(item: Tokens.ListItem): string {
+        // This should not be called directly — renderList handles items
         const text = this.parser.parse(item.tokens);
         return '  - ' + text.trim() + '\n';
       },
