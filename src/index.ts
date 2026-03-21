@@ -29,3 +29,6 @@ export type { BoxChars } from './terminal';
 
 // Word wrapping
 export { wordWrap } from './wrap';
+
+// Theme system
+export { resolveTheme, detectTheme, getTheme, hasColor } from './theme';
