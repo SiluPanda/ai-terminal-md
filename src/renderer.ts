@@ -1,7 +1,7 @@
 import type { AITerminalRenderer, RendererConfig, StreamState } from './types';
 import type { ColorLevel } from './ansi';
 import { resolveTheme, detectTheme } from './theme';
-import { detectColorLevel, detectUnicode, getWidth } from './terminal';
+import { detectColorLevel, detectUnicode, getWidth, isTTY as detectIsTTY } from './terminal';
 import { renderMarkdown, type ResolvedConfig } from './render-markdown';
 
 /** Resolve user-provided config into a fully resolved config with no optionals. */
@@ -17,6 +17,10 @@ export function resolveConfig(config?: RendererConfig): ResolvedConfig {
 
   const unicode = config?.unicode ?? detectUnicode();
 
+  // Non-TTY mode: when stdout is not a TTY, strip ANSI codes
+  // colorLevel 'none' also implies non-TTY behavior
+  const nonTTY = config?.colorLevel === 'none' || (!detectIsTTY() && config?.colorLevel === undefined);
+
   return {
     theme,
     colorLevel,
@@ -24,6 +28,7 @@ export function resolveConfig(config?: RendererConfig): ResolvedConfig {
     unicode,
     wordWrapEnabled: config?.wordWrap !== false,
     margin: config?.margin ?? 0,
+    nonTTY,
     codeBackground: config?.codeBackground !== false,
     codeLineNumbers: config?.codeLineNumbers ?? false,
     codeLanguageLabel: config?.codeLanguageLabel !== false,
