@@ -275,7 +275,10 @@ export function createMarkdownRenderer(config: ResolvedConfig): Marked {
         const inner = this.parser.parse(tokens);
         const lines = inner.replace(/\n+$/, '').split('\n');
         const border = applyStyle(box.vertical, theme.blockquoteBorder, colorLevel);
-        const result = lines.map(line => border + ' ' + line).join('\n');
+        const result = lines.map(line => {
+          const dimmedLine = applyStyle(stripAnsi(line), theme.blockquoteText, colorLevel);
+          return '  ' + border + ' ' + dimmedLine;
+        }).join('\n');
         return result + '\n\n';
       },
 
@@ -311,13 +314,28 @@ export function createMarkdownRenderer(config: ResolvedConfig): Marked {
         return this.parser.parseInline(token.tokens) + '\t';
       },
 
-      link({ href: _href, tokens }: Tokens.Link): string {
+      link({ href, tokens }: Tokens.Link): string {
         const text = this.parser.parseInline(tokens);
-        return text;
+        const styledText = applyStyle(text, theme.link, colorLevel);
+
+        // Bare URL: text matches href — display once, underlined
+        const plainText = stripAnsi(text);
+        if (plainText === href) {
+          return styledText;
+        }
+
+        // Named link: underlined text + URL in parentheses (dimmed)
+        if (config.showLinkUrls && href) {
+          const styledUrl = applyStyle('(' + href + ')', theme.linkUrl, colorLevel);
+          return styledText + ' ' + styledUrl;
+        }
+
+        return styledText;
       },
 
       image({ text }: Tokens.Image): string {
-        return text ? `[Image: ${text}]` : '[Image]';
+        const placeholder = text ? `[Image: ${text}]` : '[Image]';
+        return applyStyle(placeholder, { dim: true, italic: true }, colorLevel);
       },
 
       html({ text }: Tokens.HTML | Tokens.Tag): string {

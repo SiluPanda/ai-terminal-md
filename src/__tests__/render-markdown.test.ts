@@ -1,7 +1,7 @@
 /* eslint-disable no-control-regex */
 import { describe, it, expect } from 'vitest';
 import { renderMarkdown, type ResolvedConfig } from '../render-markdown';
-import { stripAnsi, BOLD, DIM, ITALIC, STRIKETHROUGH, RESET } from '../ansi';
+import { stripAnsi, BOLD, DIM, ITALIC, UNDERLINE, STRIKETHROUGH, RESET } from '../ansi';
 import { getTheme } from '../theme';
 
 /** Create a test config with defaults suitable for testing. */
@@ -766,6 +766,214 @@ describe('render-markdown', () => {
       expect(plain).toContain('✓');
       expect(plain).toContain('●');
       expect(plain).toContain('☐');
+    });
+  });
+
+  describe('links', () => {
+    it('renders link text with underline attribute', () => {
+      const result = render('[Click here](https://example.com)');
+      expect(result).toContain(UNDERLINE);
+      expect(result).toContain('Click here');
+    });
+
+    it('renders link text with cyan foreground in dark theme', () => {
+      const result = render('[Click here](https://example.com)');
+      // dark theme link: fg: 'cyan' -> \x1b[36m
+      expect(result).toContain('\x1b[36m');
+    });
+
+    it('shows URL in parentheses after link text when showLinkUrls is true', () => {
+      const plain = renderPlain('[docs](https://docs.example.com)');
+      expect(plain).toContain('docs');
+      expect(plain).toContain('(https://docs.example.com)');
+    });
+
+    it('renders URL portion with dim style', () => {
+      const result = render('[docs](https://example.com)');
+      expect(result).toContain(DIM);
+      expect(result).toContain('https://example.com');
+    });
+
+    it('hides URL when showLinkUrls is false', () => {
+      const plain = renderPlain('[docs](https://example.com)', { showLinkUrls: false });
+      expect(plain).toContain('docs');
+      expect(plain).not.toContain('https://example.com');
+    });
+
+    it('renders bare URL once, underlined', () => {
+      const plain = renderPlain('https://example.com');
+      const occurrences = plain.split('https://example.com').length - 1;
+      expect(occurrences).toBe(1);
+    });
+
+    it('applies underline style to bare URL', () => {
+      const result = render('https://example.com');
+      expect(result).toContain(UNDERLINE);
+    });
+
+    it('renders link with inline formatting in text', () => {
+      const plain = renderPlain('[**bold link**](https://example.com)');
+      expect(plain).toContain('bold link');
+      expect(plain).toContain('(https://example.com)');
+    });
+
+    it('handles link with no href', () => {
+      // Edge case: marked may produce a link with empty href
+      const plain = renderPlain('[text]()');
+      expect(plain).toContain('text');
+    });
+
+    it('preserves text around links', () => {
+      const plain = renderPlain('Visit [the docs](https://example.com) for details.');
+      expect(plain).toContain('Visit');
+      expect(plain).toContain('the docs');
+      expect(plain).toContain('for details.');
+    });
+  });
+
+  describe('blockquotes', () => {
+    it('renders blockquote with left border character', () => {
+      const plain = renderPlain('> This is a quote');
+      expect(plain).toContain('│');
+      expect(plain).toContain('This is a quote');
+    });
+
+    it('renders blockquote border with dim style', () => {
+      const result = render('> Quote text');
+      expect(result).toContain(DIM);
+    });
+
+    it('renders blockquote text with dim style', () => {
+      const result = render('> Quote text');
+      // The text should be dimmed
+      expect(result).toContain(DIM);
+      expect(result).toContain('Quote text');
+    });
+
+    it('renders blockquote with two-space indent', () => {
+      const plain = renderPlain('> Quote text');
+      const lines = plain.split('\n').filter(l => l.includes('Quote'));
+      expect(lines.length).toBeGreaterThan(0);
+      // Should start with 2 spaces before the border
+      expect(lines[0]).toMatch(/^\s{2}│/);
+    });
+
+    it('renders multi-line blockquote with border on each line', () => {
+      const plain = renderPlain('> Line one\n> Line two\n> Line three');
+      const lines = plain.split('\n').filter(l => l.includes('│'));
+      expect(lines.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('renders nested blockquote with additional border', () => {
+      const plain = renderPlain('> outer\n> > inner');
+      // The inner blockquote should have two │ characters
+      const lines = plain.split('\n');
+      const innerLine = lines.find(l => l.includes('inner'));
+      expect(innerLine).toBeDefined();
+      // Count │ characters
+      const borderCount = (innerLine!.match(/│/g) || []).length;
+      expect(borderCount).toBeGreaterThanOrEqual(2);
+    });
+
+    it('uses ASCII pipe when unicode is false', () => {
+      const plain = renderPlain('> Quote', { unicode: false });
+      expect(plain).toContain('|');
+      expect(plain).not.toContain('│');
+    });
+
+    it('renders blockquote with inline formatting', () => {
+      const plain = renderPlain('> **bold** text');
+      expect(plain).toContain('bold text');
+      expect(plain).toContain('│');
+    });
+
+    it('renders empty blockquote lines with border', () => {
+      const plain = renderPlain('> Line one\n>\n> Line three');
+      const borderLines = plain.split('\n').filter(l => l.includes('│'));
+      expect(borderLines.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('horizontal rules', () => {
+    it('renders horizontal rule as full-width line', () => {
+      const plain = renderPlain('---');
+      expect(plain).toContain('─');
+      const lines = plain.split('\n');
+      const ruleLine = lines.find(l => l.includes('─'));
+      expect(ruleLine).toBeDefined();
+      expect(ruleLine!.length).toBe(80);
+    });
+
+    it('renders horizontal rule with dim style', () => {
+      const result = render('---');
+      expect(result).toContain(DIM);
+    });
+
+    it('renders horizontal rule with ASCII when unicode is false', () => {
+      const plain = renderPlain('---', { unicode: false });
+      expect(plain).toContain('-');
+      expect(plain).not.toContain('─');
+    });
+
+    it('renders *** as horizontal rule', () => {
+      const plain = renderPlain('***');
+      expect(plain).toContain('─');
+    });
+
+    it('renders ___ as horizontal rule', () => {
+      const plain = renderPlain('___');
+      expect(plain).toContain('─');
+    });
+
+    it('horizontal rule spans configured width', () => {
+      const plain = renderPlain('---', { width: 40 });
+      const lines = plain.split('\n');
+      const ruleLine = lines.find(l => l.includes('─'));
+      expect(ruleLine).toBeDefined();
+      expect(ruleLine!.length).toBe(40);
+    });
+
+    it('horizontal rule respects margin', () => {
+      const plain = renderPlain('---', { width: 80, margin: 5 });
+      const lines = plain.split('\n');
+      const ruleLine = lines.find(l => l.includes('─'));
+      expect(ruleLine).toBeDefined();
+      // contentWidth = 80 - 5*2 = 70
+      expect(ruleLine!.length).toBe(70);
+    });
+
+    it('renders horizontal rule between paragraphs', () => {
+      const plain = renderPlain('Before\n\n---\n\nAfter');
+      expect(plain).toContain('Before');
+      expect(plain).toContain('─');
+      expect(plain).toContain('After');
+    });
+  });
+
+  describe('images', () => {
+    it('renders image with alt text as placeholder', () => {
+      const plain = renderPlain('![A beautiful sunset](https://example.com/sunset.jpg)');
+      expect(plain).toContain('[Image: A beautiful sunset]');
+    });
+
+    it('renders image without alt text as [Image]', () => {
+      const plain = renderPlain('![](https://example.com/photo.jpg)');
+      expect(plain).toContain('[Image]');
+    });
+
+    it('renders image placeholder with dim style', () => {
+      const result = render('![alt text](https://example.com/img.png)');
+      expect(result).toContain(DIM);
+    });
+
+    it('renders image placeholder with italic style', () => {
+      const result = render('![alt text](https://example.com/img.png)');
+      expect(result).toContain(ITALIC);
+    });
+
+    it('renders image inside paragraph text', () => {
+      const plain = renderPlain('See this: ![diagram](url) for reference.');
+      expect(plain).toContain('[Image: diagram]');
     });
   });
 

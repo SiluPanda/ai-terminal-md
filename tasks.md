@@ -86,11 +86,11 @@
 - [x] **Render unordered lists** — Use level-specific bullet characters: `●` (level 0), `○` (level 1), `■` (level 2), `▸` (level 3+). Two spaces indent per nesting level. Fall back to ASCII when unicode is disabled. | Status: done
 - [x] **Render ordered lists** — Number followed by period. Nested ordered lists with their own numbering. Sub-items use `a.`, `b.`, etc. | Status: done
 - [x] **Render task lists** — `[x]` renders as green `✓`, `[ ]` renders as dim `☐`. ASCII fallback: `[x]` and `[ ]`. | Status: done
-- [ ] **Render links** — Link text underlined, URL in parentheses dimmed (when `showLinkUrls` is true). Bare URLs displayed once, underlined. | Status: not_done
-- [ ] **Render blockquotes** — Left border with `│` in dim color. Text dimmed. Two-space indent. Nested blockquotes add additional `│` with space separator. | Status: not_done
+- [x] **Render links** — Link text underlined, URL in parentheses dimmed (when `showLinkUrls` is true). Bare URLs displayed once, underlined. | Status: done
+- [x] **Render blockquotes** — Left border with `│` in dim color. Text dimmed. Two-space indent. Nested blockquotes add additional `│` with space separator. | Status: done
 - [ ] **Render tables** — Box-drawing borders (Unicode by default, ASCII fallback). Auto-calculated column widths. Bold header row. Honor alignment syntax (`:---`, `:---:`, `---:`). Separator between header and body with `├─┼─┤`. Configurable via `tableStyle`. | Status: not_done
-- [ ] **Render horizontal rules** — Full-width line using `─` (or `-` in ASCII mode), dimmed. | Status: not_done
-- [ ] **Render images** — Placeholder text: `[Image: alt text]` in dim italic. If no alt text, render `[Image]`. | Status: not_done
+- [x] **Render horizontal rules** — Full-width line using `─` (or `-` in ASCII mode), dimmed. | Status: done
+- [x] **Render images** — Placeholder text: `[Image: alt text]` in dim italic. If no alt text, render `[Image]`. | Status: done
 
 ### 3.2 Renderer Class (`src/renderer.ts`)
 
