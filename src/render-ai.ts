@@ -88,11 +88,13 @@ export function renderArtifact(
   // panel mode (default)
   const borderStyle = theme.artifactBorder;
   const titleStyle = theme.artifactTitle;
+  // innerWidth is the space between the corner characters (╭/╮)
+  const innerWidth = contentWidth + 2;
 
   // Build top border: ╭─ Title [type] ─╮
   const styledTitle = applyStyle(` ${titleText}${typeLabel} `, titleStyle, colorLevel);
   const plainTitleLen = visibleLength(styledTitle);
-  const dashCount = Math.max(contentWidth - plainTitleLen - 2, 0);
+  const dashCount = Math.max(innerWidth - plainTitleLen, 0);
   const leftDashes = '─'.repeat(Math.floor(dashCount / 2));
   const rightDashes = '─'.repeat(dashCount - Math.floor(dashCount / 2));
 
@@ -100,7 +102,7 @@ export function renderArtifact(
     + styledTitle
     + applyStyle(rightDashes + '╮', borderStyle, colorLevel);
 
-  const bottomBorder = applyStyle('╰' + '─'.repeat(contentWidth) + '╯', borderStyle, colorLevel);
+  const bottomBorder = applyStyle('╰' + '─'.repeat(innerWidth) + '╯', borderStyle, colorLevel);
   const styledSide = applyStyle('│', borderStyle, colorLevel);
 
   const contentLines = element.content.split('\n');
@@ -136,11 +138,12 @@ export function renderToolUse(
   const headerStyle = theme.toolUseHeader;
   const keyStyle = theme.toolUseKey;
   const valStyle = theme.toolUseValue;
+  const innerWidth = contentWidth + 2;
 
   const headerText = ` Tool Call: ${element.toolName} `;
   const styledHeader = applyStyle(headerText, headerStyle, colorLevel);
   const plainHeaderLen = visibleLength(styledHeader);
-  const dashCount = Math.max(contentWidth - plainHeaderLen - 2, 0);
+  const dashCount = Math.max(innerWidth - plainHeaderLen, 0);
   const leftDashes = '─'.repeat(Math.floor(dashCount / 2));
   const rightDashes = '─'.repeat(dashCount - Math.floor(dashCount / 2));
 
@@ -148,7 +151,7 @@ export function renderToolUse(
     + styledHeader
     + applyStyle(rightDashes + '┐', borderStyle, colorLevel);
 
-  const bottomBorder = applyStyle('└' + '─'.repeat(contentWidth) + '┘', borderStyle, colorLevel);
+  const bottomBorder = applyStyle('└' + '─'.repeat(innerWidth) + '┘', borderStyle, colorLevel);
   const styledSide = applyStyle('│', borderStyle, colorLevel);
 
   // Render args as JSON lines
@@ -195,12 +198,13 @@ export function renderToolResult(
   // box mode (default)
   const borderStyle = theme.toolResultBorder;
   const headerStyle = theme.toolResultHeader;
+  const innerWidth = contentWidth + 2;
 
   const styledStatus = applyStyle(statusIcon, statusStyle, colorLevel);
   const headerText = ` Tool Result${toolLabel} `;
   const styledHeader = styledStatus + applyStyle(headerText, headerStyle, colorLevel);
   const plainHeaderLen = 1 + visibleLength(applyStyle(headerText, headerStyle, colorLevel));
-  const dashCount = Math.max(contentWidth - plainHeaderLen - 2, 0);
+  const dashCount = Math.max(innerWidth - plainHeaderLen, 0);
   const leftDashes = '─'.repeat(Math.floor(dashCount / 2));
   const rightDashes = '─'.repeat(dashCount - Math.floor(dashCount / 2));
 
@@ -208,7 +212,7 @@ export function renderToolResult(
     + styledHeader
     + applyStyle(rightDashes + '┐', borderStyle, colorLevel);
 
-  const bottomBorder = applyStyle('└' + '─'.repeat(contentWidth) + '┘', borderStyle, colorLevel);
+  const bottomBorder = applyStyle('└' + '─'.repeat(innerWidth) + '┘', borderStyle, colorLevel);
   const styledSide = applyStyle('│', borderStyle, colorLevel);
 
   const contentLines = element.content.split('\n').map(line => styledSide + ' ' + line);

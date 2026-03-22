@@ -92,6 +92,21 @@ function rgbTo16Fg(r: number, g: number, b: number): number {
   return isBright ? 95 : 35; // magenta
 }
 
+/** Convert a 256-color palette index (16-255) to RGB. */
+function index256ToRgb(index: number): [number, number, number] {
+  if (index >= 232) {
+    // Grayscale ramp: 232-255 → gray levels 8, 18, 28, ..., 238
+    const gray = (index - 232) * 10 + 8;
+    return [gray, gray, gray];
+  }
+  // 6×6×6 color cube: indices 16-231
+  const idx = index - 16;
+  const b = (idx % 6) * 51;
+  const g = (Math.floor(idx / 6) % 6) * 51;
+  const r = Math.floor(idx / 36) * 51;
+  return [r, g, b];
+}
+
 /** Generate the foreground ANSI escape for a color string at the given level. */
 function fgSequence(color: string, level: ColorLevel): string {
   if (level === 'none') return '';
@@ -105,8 +120,11 @@ function fgSequence(color: string, level: ColorLevel): string {
   const num = Number(color);
   if (!isNaN(num) && num >= 0 && num <= 255) {
     if (level === '16') {
-      // Rough downgrade: use the base color
-      return `\x1b[${num < 8 ? 30 + num : 82 + num}m`;
+      // Downgrade: 0-7 → basic, 8-15 → bright, 16-255 → closest via RGB
+      if (num <= 7) return `\x1b[${30 + num}m`;
+      if (num <= 15) return `\x1b[${82 + num}m`;
+      const [r, g, b] = index256ToRgb(num);
+      return `\x1b[${rgbTo16Fg(r, g, b)}m`;
     }
     return `\x1b[38;5;${num}m`;
   }
@@ -140,7 +158,11 @@ function bgSequence(color: string, level: ColorLevel): string {
   const num = Number(color);
   if (!isNaN(num) && num >= 0 && num <= 255) {
     if (level === '16') {
-      return `\x1b[${num < 8 ? 40 + num : 92 + num}m`;
+      // Downgrade: 0-7 → basic bg, 8-15 → bright bg, 16-255 → closest via RGB
+      if (num <= 7) return `\x1b[${40 + num}m`;
+      if (num <= 15) return `\x1b[${92 + num}m`;
+      const [r, g, b] = index256ToRgb(num);
+      return `\x1b[${rgbTo16Fg(r, g, b) + 10}m`;
     }
     return `\x1b[48;5;${num}m`;
   }
@@ -219,4 +241,4 @@ export function visibleLength(str: string): number {
 // Re-export constants for direct use
 export { BOLD, DIM, ITALIC, UNDERLINE, STRIKETHROUGH, RESET };
 export { FG_COLORS, BG_COLORS };
-export { parseHex, rgbTo256, rgbTo16Fg, fgSequence, bgSequence };
+export { parseHex, rgbTo256, rgbTo16Fg, index256ToRgb, fgSequence, bgSequence };
