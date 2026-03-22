@@ -243,6 +243,50 @@ describe('renderCitation()', () => {
   });
 });
 
+describe('box width consistency', () => {
+  it('artifact panel top and bottom borders have the same width', () => {
+    const el = {
+      type: 'artifact' as const,
+      artifactType: 'code',
+      title: 'Test',
+      identifier: 'test-1',
+      content: 'line 1\nline 2',
+    };
+    const result = renderArtifact(el, 'panel', makeConfig());
+    const lines = stripAnsi(result).split('\n').filter(l => l.trim());
+    const topLine = lines[0];
+    const bottomLine = lines[lines.length - 1];
+    expect(topLine.length).toBe(bottomLine.length);
+  });
+
+  it('tool use box top and bottom borders have the same width', () => {
+    const el = {
+      type: 'tool-use' as const,
+      toolName: 'search',
+      arguments: { q: 'test' },
+    };
+    const result = renderToolUse(el, 'box', makeConfig());
+    const lines = stripAnsi(result).split('\n').filter(l => l.trim());
+    const topLine = lines[0];
+    const bottomLine = lines[lines.length - 1];
+    expect(topLine.length).toBe(bottomLine.length);
+  });
+
+  it('tool result box top and bottom borders have the same width', () => {
+    const el = {
+      type: 'tool-result' as const,
+      toolName: 'search',
+      isError: false,
+      content: 'ok',
+    };
+    const result = renderToolResult(el, 'box', makeConfig());
+    const lines = stripAnsi(result).split('\n').filter(l => l.trim());
+    const topLine = lines[0];
+    const bottomLine = lines[lines.length - 1];
+    expect(topLine.length).toBe(bottomLine.length);
+  });
+});
+
 describe('renderAIElement() dispatch', () => {
   it('dispatches thinking to renderThinking with default dim mode', () => {
     const el = { type: 'thinking' as const, content: 'thought', tagName: 'thinking' };

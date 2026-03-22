@@ -14,6 +14,7 @@ import {
   parseHex,
   rgbTo256,
   rgbTo16Fg,
+  index256ToRgb,
   fgSequence,
   bgSequence,
 } from '../ansi';
@@ -124,6 +125,25 @@ describe('ansi', () => {
     });
   });
 
+  describe('index256ToRgb', () => {
+    it('converts color cube index to RGB', () => {
+      // index 196 = 16 + 36*5 + 6*0 + 0 = pure red (255, 0, 0)
+      expect(index256ToRgb(196)).toEqual([255, 0, 0]);
+    });
+
+    it('converts grayscale index to RGB', () => {
+      // index 232 = first grayscale = (232-232)*10+8 = 8
+      expect(index256ToRgb(232)).toEqual([8, 8, 8]);
+      // index 255 = last grayscale = (255-232)*10+8 = 238
+      expect(index256ToRgb(255)).toEqual([238, 238, 238]);
+    });
+
+    it('converts mid-range color cube index', () => {
+      // index 16 = 16 + 36*0 + 6*0 + 0 = black in cube (0, 0, 0)
+      expect(index256ToRgb(16)).toEqual([0, 0, 0]);
+    });
+  });
+
   describe('fgSequence', () => {
     it('returns empty string for none color level', () => {
       expect(fgSequence('red', 'none')).toBe('');
@@ -157,6 +177,25 @@ describe('ansi', () => {
     it('returns empty string for unknown color', () => {
       expect(fgSequence('notacolor', '16')).toBe('');
     });
+
+    it('downgrades 256-color indices 16-255 to valid 16-color codes', () => {
+      // Index 196 = red in color cube; downgrade should produce a valid ANSI code (30-37 or 90-97)
+      const seq = fgSequence('196', '16');
+      // eslint-disable-next-line no-control-regex
+      const match = seq.match(/^\x1b\[(\d+)m$/);
+      expect(match).not.toBeNull();
+      const code = Number(match![1]);
+      expect(code >= 30 && code <= 37 || code >= 90 && code <= 97).toBe(true);
+    });
+
+    it('downgrades grayscale 256-color to valid 16-color codes', () => {
+      const seq = fgSequence('240', '16');
+      // eslint-disable-next-line no-control-regex
+      const match = seq.match(/^\x1b\[(\d+)m$/);
+      expect(match).not.toBeNull();
+      const code = Number(match![1]);
+      expect(code >= 30 && code <= 37 || code >= 90 && code <= 97).toBe(true);
+    });
   });
 
   describe('bgSequence', () => {
@@ -175,6 +214,15 @@ describe('ansi', () => {
 
     it('generates truecolor background from hex', () => {
       expect(bgSequence('#00FF00', 'truecolor')).toBe('\x1b[48;2;0;255;0m');
+    });
+
+    it('downgrades 256-color bg indices 16-255 to valid 16-color codes', () => {
+      const seq = bgSequence('196', '16');
+      // eslint-disable-next-line no-control-regex
+      const match = seq.match(/^\x1b\[(\d+)m$/);
+      expect(match).not.toBeNull();
+      const code = Number(match![1]);
+      expect(code >= 40 && code <= 47 || code >= 100 && code <= 107).toBe(true);
     });
   });
 
