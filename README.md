@@ -3,6 +3,7 @@
 Terminal markdown renderer optimized for AI-generated content.
 
 [![npm version](https://img.shields.io/npm/v/ai-terminal-md.svg)](https://www.npmjs.com/package/ai-terminal-md)
+[![npm downloads](https://img.shields.io/npm/dt/ai-terminal-md.svg)](https://www.npmjs.com/package/ai-terminal-md)
 [![license](https://img.shields.io/npm/l/ai-terminal-md.svg)](https://github.com/SiluPanda/ai-terminal-md/blob/master/LICENSE)
 [![node](https://img.shields.io/node/v/ai-terminal-md.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
