@@ -180,60 +180,60 @@
 
 ### 5.1 AI Pattern Parser (`src/parser.ts`)
 
-- [ ] **Implement thinking block detection** — Detect all thinking tag variants: `<thinking>`, `<antThinking>`, `<reflection>`, `<scratchpad>`, `<reasoning>`, `<inner_monologue>`, `<thought>`. Case-insensitive regex matching. Handle nested content by matching outermost tag pairs. Support multiple thinking blocks in a single response. | Status: not_done
-- [ ] **Implement artifact block detection** — Detect `<artifact ...>...</artifact>`. Extract attributes: `type`, `title`, `identifier` from the opening tag. | Status: not_done
-- [ ] **Implement tool use block detection** — Detect `<tool_use>`, `<function_call>`, `<tool_call>` patterns. Extract tool name from `<tool_name>` or `<name>` child element. Extract arguments from `<arguments>` or `<parameters>` child element. Parse arguments as JSON or key-value pairs. | Status: not_done
-- [ ] **Implement tool result block detection** — Detect `<tool_result>`, `<function_result>` patterns. Detect error status from `status="error"` attribute or content starting with `"Error:"`. | Status: not_done
-- [ ] **Implement semantic wrapper detection** — Detect `<result>`, `<answer>`, `<output>`, `<response>` wrapper tags. | Status: not_done
-- [ ] **Implement citation detection** — Detect `[1]`, `[2]`, `[Source: ...]`, and `[LabelText]` patterns using regex. Distinguish citations from markdown link syntax. | Status: not_done
-- [ ] **Implement pre-processing pipeline** — Scan raw markdown for AI-specific XML elements before passing to `marked`. Extract AI elements, replace them with placeholder markers, and return a map of placeholder -> structured AI element data. | Status: not_done
+- [x] **Implement thinking block detection** — Detect all thinking tag variants: `<thinking>`, `<antThinking>`, `<reflection>`, `<scratchpad>`, `<reasoning>`, `<inner_monologue>`, `<thought>`. Case-insensitive regex matching. Handle nested content by matching outermost tag pairs. Support multiple thinking blocks in a single response. | Status: done
+- [x] **Implement artifact block detection** — Detect `<artifact ...>...</artifact>`. Extract attributes: `type`, `title`, `identifier` from the opening tag. | Status: done
+- [x] **Implement tool use block detection** — Detect `<tool_use>`, `<function_call>`, `<tool_call>` patterns. Extract tool name from `<tool_name>` or `<name>` child element. Extract arguments from `<arguments>` or `<parameters>` child element. Parse arguments as JSON or key-value pairs. | Status: done
+- [x] **Implement tool result block detection** — Detect `<tool_result>`, `<function_result>` patterns. Detect error status from `status="error"` attribute or content starting with `"Error:"`. | Status: done
+- [x] **Implement semantic wrapper detection** — Detect `<result>`, `<answer>`, `<output>`, `<response>` wrapper tags. | Status: done
+- [x] **Implement citation detection** — Detect `[1]`, `[2]`, `[Source: ...]`, and `[LabelText]` patterns using regex. Distinguish citations from markdown link syntax. | Status: done
+- [x] **Implement pre-processing pipeline** — Scan raw markdown for AI-specific XML elements before passing to `marked`. Extract AI elements, replace them with placeholder markers, and return a map of placeholder -> structured AI element data. | Status: done
 
 ### 5.2 AI Element Renderer (`src/render-ai.ts`)
 
-- [ ] **Render thinking blocks (dim mode)** — Render with "Thinking" header in dim italic, body in dim text with left `│` border, two-space indent per line. Separated by blank lines. | Status: not_done
-- [ ] **Render thinking blocks (show mode)** — Same structure as dim mode but at full brightness (no dim attribute on body text). | Status: not_done
-- [ ] **Render thinking blocks (hide mode)** — Omit entirely from output. Parse and skip. | Status: not_done
-- [ ] **Render artifact blocks (panel mode)** — Bordered panel with Unicode rounded corners (`╭╮╰╯`). Title bar showing artifact title and type in bold. Content indented by two characters inside border. Content rendered using standard markdown rules (inner code blocks get highlighting). Wrap content to fit within border width. | Status: not_done
-- [ ] **Render artifact blocks (inline mode)** — Title label above content (no border). Content rendered normally. | Status: not_done
-- [ ] **Render artifact blocks (hide mode)** — Omit entirely. | Status: not_done
-- [ ] **Render tool use blocks (box mode)** — Single-line box-drawing border (`┌┐└┘`). Header "Tool Call:" + tool name in bold. Arguments as indented key-value pairs: key in cyan, value in default color. JSON objects pretty-printed, primitives inline. | Status: not_done
-- [ ] **Render tool use blocks (inline mode)** — Compact inline: `[Tool: tool_name(arg1, arg2)]`. | Status: not_done
-- [ ] **Render tool use blocks (hide mode)** — Omit entirely. | Status: not_done
-- [ ] **Render tool result blocks (box mode)** — Single-line box border. Header "Result" in green for success, "Error" in red for error. Content syntax-highlighted if JSON. | Status: not_done
-- [ ] **Render tool result blocks (inline mode)** — Compact inline representation. | Status: not_done
-- [ ] **Render tool result blocks (hide mode)** — Omit entirely. | Status: not_done
-- [ ] **Render semantic wrappers (strip mode)** — Remove tags entirely, render inner content with standard markdown rules. | Status: not_done
-- [ ] **Render semantic wrappers (label mode)** — Remove tags, add subtle label above content (e.g., "Answer:"). | Status: not_done
-- [ ] **Render semantic wrappers (keep mode)** — Pass through raw tags as literal text. | Status: not_done
-- [ ] **Render citations (color mode)** — Color citation markers (blue by default) to make them visually scannable. | Status: not_done
-- [ ] **Render citations (plain mode)** — No special styling, render as plain text. | Status: not_done
-- [ ] **Render citations (hide mode)** — Remove citation markers from output. | Status: not_done
+- [x] **Render thinking blocks (dim mode)** — Render with "Thinking" header in dim italic, body in dim text with left `│` border, two-space indent per line. Separated by blank lines. | Status: done
+- [x] **Render thinking blocks (show mode)** — Same structure as dim mode but at full brightness (no dim attribute on body text). | Status: done
+- [x] **Render thinking blocks (hide mode)** — Omit entirely from output. Parse and skip. | Status: done
+- [x] **Render artifact blocks (panel mode)** — Bordered panel with Unicode rounded corners (`╭╮╰╯`). Title bar showing artifact title and type in bold. Content indented by two characters inside border. Content rendered using standard markdown rules (inner code blocks get highlighting). Wrap content to fit within border width. | Status: done
+- [x] **Render artifact blocks (inline mode)** — Title label above content (no border). Content rendered normally. | Status: done
+- [x] **Render artifact blocks (hide mode)** — Omit entirely. | Status: done
+- [x] **Render tool use blocks (box mode)** — Single-line box-drawing border (`┌┐└┘`). Header "Tool Call:" + tool name in bold. Arguments as indented key-value pairs: key in cyan, value in default color. JSON objects pretty-printed, primitives inline. | Status: done
+- [x] **Render tool use blocks (inline mode)** — Compact inline: `[Tool: tool_name(arg1, arg2)]`. | Status: done
+- [x] **Render tool use blocks (hide mode)** — Omit entirely. | Status: done
+- [x] **Render tool result blocks (box mode)** — Single-line box border. Header "Result" in green for success, "Error" in red for error. Content syntax-highlighted if JSON. | Status: done
+- [x] **Render tool result blocks (inline mode)** — Compact inline representation. | Status: done
+- [x] **Render tool result blocks (hide mode)** — Omit entirely. | Status: done
+- [x] **Render semantic wrappers (strip mode)** — Remove tags entirely, render inner content with standard markdown rules. | Status: done
+- [x] **Render semantic wrappers (label mode)** — Remove tags, add subtle label above content (e.g., "Answer:"). | Status: done
+- [x] **Render semantic wrappers (keep mode)** — Pass through raw tags as literal text. | Status: done
+- [x] **Render citations (color mode)** — Color citation markers (blue by default) to make them visually scannable. | Status: done
+- [x] **Render citations (plain mode)** — No special styling, render as plain text. | Status: done
+- [x] **Render citations (hide mode)** — Remove citation markers from output. | Status: done
 - [ ] **Render reasoning steps** — Detect numbered lists with substantive items. Apply enhanced visual hierarchy: bold step numbers in distinct color (yellow), increased indentation for step content, blank line separation between steps. Nested content (code blocks, sub-lists) indented relative to the step. | Status: not_done
 
 ### 5.3 Integrate AI Rendering into Main Pipeline
 
-- [ ] **Update `renderer.ts` with AI pre-processing** — Before markdown parsing, run the AI pattern parser to extract AI elements and replace with placeholders. After markdown rendering, splice AI-rendered elements back at placeholder positions. | Status: not_done
-- [ ] **Handle mixed AI and standard markdown** — Ensure AI elements interleaved with standard markdown (headings, paragraphs, code blocks) render correctly with proper spacing and no lost content. | Status: not_done
+- [x] **Update `renderer.ts` with AI pre-processing** — Before markdown parsing, run the AI pattern parser to extract AI elements and replace with placeholders. After markdown rendering, splice AI-rendered elements back at placeholder positions. | Status: done
+- [x] **Handle mixed AI and standard markdown** — Ensure AI elements interleaved with standard markdown (headings, paragraphs, code blocks) render correctly with proper spacing and no lost content. | Status: done
 
 ### 5.4 AI Element Tests
 
-- [ ] **Test thinking block dim rendering** — Verify `<thinking>content</thinking>` renders with dim text, border character, and "Thinking" header. | Status: not_done
-- [ ] **Test thinking block hide rendering** — Verify `<thinking>content</thinking>` is omitted when `thinking: 'hide'`. | Status: not_done
-- [ ] **Test thinking block show rendering** — Verify `<thinking>content</thinking>` renders at full brightness when `thinking: 'show'`. | Status: not_done
-- [ ] **Test all thinking tag variants** — Verify `<antThinking>`, `<reflection>`, `<scratchpad>`, `<reasoning>`, `<inner_monologue>`, `<thought>` are all detected and rendered. | Status: not_done
-- [ ] **Test artifact panel rendering** — Verify `<artifact type="..." title="...">content</artifact>` produces bordered panel with title bar showing type and title. | Status: not_done
-- [ ] **Test artifact attribute extraction** — Verify `type`, `title`, and `identifier` attributes are correctly parsed from the opening tag. | Status: not_done
+- [x] **Test thinking block dim rendering** — Verify `<thinking>content</thinking>` renders with dim text, border character, and "Thinking" header. | Status: done
+- [x] **Test thinking block hide rendering** — Verify `<thinking>content</thinking>` is omitted when `thinking: 'hide'`. | Status: done
+- [x] **Test thinking block show rendering** — Verify `<thinking>content</thinking>` renders at full brightness when `thinking: 'show'`. | Status: done
+- [x] **Test all thinking tag variants** — Verify `<antThinking>`, `<reflection>`, `<scratchpad>`, `<reasoning>`, `<inner_monologue>`, `<thought>` are all detected and rendered. | Status: done
+- [x] **Test artifact panel rendering** — Verify `<artifact type="..." title="...">content</artifact>` produces bordered panel with title bar showing type and title. | Status: done
+- [x] **Test artifact attribute extraction** — Verify `type`, `title`, and `identifier` attributes are correctly parsed from the opening tag. | Status: done
 - [ ] **Test artifact inner content rendering** — Verify code blocks inside artifacts get syntax highlighting. | Status: not_done
-- [ ] **Test tool use box rendering** — Verify `<tool_use>` with tool name and JSON arguments renders as function call box with key-value pairs. | Status: not_done
-- [ ] **Test tool use alternative patterns** — Verify `<function_call>` and `<tool_call>` variants are detected. | Status: not_done
-- [ ] **Test tool result success rendering** — Verify tool result renders with green "Result" header. | Status: not_done
-- [ ] **Test tool result error rendering** — Verify tool result with `status="error"` renders with red "Error" header. | Status: not_done
-- [ ] **Test semantic wrapper strip mode** — Verify `<result>content</result>` strips tags and renders inner content. | Status: not_done
-- [ ] **Test semantic wrapper label mode** — Verify label is added above content. | Status: not_done
+- [x] **Test tool use box rendering** — Verify `<tool_use>` with tool name and JSON arguments renders as function call box with key-value pairs. | Status: done
+- [x] **Test tool use alternative patterns** — Verify `<function_call>` and `<tool_call>` variants are detected. | Status: done
+- [x] **Test tool result success rendering** — Verify tool result renders with green "Result" header. | Status: done
+- [x] **Test tool result error rendering** — Verify tool result with `status="error"` renders with red "Error" header. | Status: done
+- [x] **Test semantic wrapper strip mode** — Verify `<result>content</result>` strips tags and renders inner content. | Status: done
+- [x] **Test semantic wrapper label mode** — Verify label is added above content. | Status: done
 - [ ] **Test semantic wrapper keep mode** — Verify raw tags are preserved as literal text. | Status: not_done
-- [ ] **Test citation color rendering** — Verify `[1]` and `[2]` render in citation color (blue in dark theme). | Status: not_done
-- [ ] **Test citation hide rendering** — Verify citations are removed from output when `citations: 'hide'`. | Status: not_done
-- [ ] **Test multiple thinking blocks** — Verify multiple `<thinking>` blocks in one response are each rendered independently. | Status: not_done
+- [x] **Test citation color rendering** — Verify `[1]` and `[2]` render in citation color (blue in dark theme). | Status: done
+- [x] **Test citation hide rendering** — Verify citations are removed from output when `citations: 'hide'`. | Status: done
+- [x] **Test multiple thinking blocks** — Verify multiple `<thinking>` blocks in one response are each rendered independently. | Status: done
 - [ ] **Test mixed AI and markdown content** — Verify a response containing thinking, code blocks, headings, tool calls, and regular text renders correctly with proper ordering and spacing. | Status: not_done
 - [ ] **Create test fixtures for AI elements** — Create `src/__tests__/fixtures/ai-elements.ts` with reusable AI element markdown samples. | Status: not_done
 
@@ -245,43 +245,43 @@
 
 - [ ] **Define internal streaming state structure** — Define the internal state tracked by the streaming renderer: current state enum (`text`, `code-fence`, `code-inline`, `thinking`, `artifact`, `tool-use`, `tool-result`, `heading`, `blockquote`, `list`, `table`), line buffer, pending inline formatting state, deferred content buffer. | Status: not_done
 - [ ] **Implement state transitions** — Implement all state transitions defined in the spec: `text` -> `code-fence` on opening fence, `code-fence` -> `text` on closing fence, `text` -> `thinking` on `<thinking>`, `thinking` -> `text` on `</thinking>`, and all other transitions listed in section 8. | Status: not_done
-- [ ] **Implement line buffering** — Accumulate incoming tokens into a line buffer. When `\n` is received, the completed line is available for processing. | Status: not_done
+- [x] **Implement line buffering** — Accumulate incoming tokens into a line buffer. When `\n` is received, the completed line is available for processing. | Status: done
 - [ ] **Implement line classification** — Classify completed lines based on current state and line content. Detect headings, code fences, AI XML tags, list markers, table pipes, blockquote markers. | Status: not_done
-- [ ] **Implement immediate output for unambiguous lines** — Render and flush lines that can be definitively classified: paragraph text, list items, heading lines (in text state), code lines (in code-fence state). | Status: not_done
-- [ ] **Implement deferred output for ambiguous lines** — Buffer lines that need more context for classification (e.g., first line of a potential table). | Status: not_done
+- [x] **Implement immediate output for unambiguous lines** — Render and flush lines that can be definitively classified: paragraph text, list items, heading lines (in text state), code lines (in code-fence state). | Status: done
+- [x] **Implement deferred output for ambiguous lines** — Buffer lines that need more context for classification (e.g., first line of a potential table). | Status: done
 - [ ] **Implement inline formatting tracking** — Track open bold/italic/code-inline spans across chunks. Apply styling even when the opening and closing markers arrive in different chunks. | Status: not_done
 
 ### 6.2 Streaming API Methods
 
-- [ ] **Implement `renderChunk(chunk, state?)` method** — Accept a chunk string and optional previous state. Process the chunk through the state machine. Return `{ output: string; state: StreamState }`. Create initial state if no state provided. | Status: not_done
-- [ ] **Implement `renderStream(stream)` method** — Accept `AsyncIterable<string>`, iterate through chunks calling `renderChunk`, yield rendered output strings. Call `flush` when the stream ends. | Status: not_done
-- [ ] **Implement `flush(state)` method** — Finalize a streaming session. Render any buffered content: unclosed code blocks, unclosed thinking blocks (with truncation note), pending table rows, remaining line buffer content. | Status: not_done
+- [x] **Implement `renderChunk(chunk, state?)` method** — Accept a chunk string and optional previous state. Process the chunk through the state machine. Return `{ output: string; state: StreamState }`. Create initial state if no state provided. | Status: done
+- [x] **Implement `renderStream(stream)` method** — Accept `AsyncIterable<string>`, iterate through chunks calling `renderChunk`, yield rendered output strings. Call `flush` when the stream ends. | Status: done
+- [x] **Implement `flush(state)` method** — Finalize a streaming session. Render any buffered content: unclosed code blocks, unclosed thinking blocks (with truncation note), pending table rows, remaining line buffer content. | Status: done
 
 ### 6.3 Streaming Partial Element Handling
 
-- [ ] **Handle streaming code fences** — Accumulate code lines and apply syntax highlighting per line as each line completes. Language label rendered eagerly on the fence-opening line in streaming mode. | Status: not_done
-- [ ] **Handle streaming thinking blocks** — Render thinking lines dimmed with border as they arrive. When closing tag arrives, add trailing blank line. | Status: not_done
+- [x] **Handle streaming code fences** — Accumulate code lines and apply syntax highlighting per line as each line completes. Language label rendered eagerly on the fence-opening line in streaming mode. | Status: done
+- [x] **Handle streaming thinking blocks** — Render thinking lines dimmed with border as they arrive. When closing tag arrives, add trailing blank line. | Status: done
 - [ ] **Handle streaming lists** — Render each list item as it completes. Detect nesting by indentation. | Status: not_done
 - [ ] **Handle streaming tables** — Buffer until header separator row (`|---|`) is seen, then render header and subsequent rows as they arrive. | Status: not_done
 - [ ] **Handle streaming inline code** — Buffer until closing backtick or end of line. If end of line with no closing backtick, render buffered text with inline code styling. | Status: not_done
-- [ ] **Handle unclosed elements on flush** — Unclosed code fence: render accumulated code content. Unclosed thinking block: render with truncation note. Growing list: finalize list rendering. | Status: not_done
+- [x] **Handle unclosed elements on flush** — Unclosed code fence: render accumulated code content. Unclosed thinking block: render with truncation note. Growing list: finalize list rendering. | Status: done
 
 ### 6.4 Wire Streaming into Renderer
 
-- [ ] **Add `renderStream`, `renderChunk`, `flush` to `AITerminalRenderer` class** — Wire the streaming module methods into the renderer class, passing through the resolved config and theme. | Status: not_done
+- [x] **Add `renderStream`, `renderChunk`, `flush` to `AITerminalRenderer` class** — Wire the streaming module methods into the renderer class, passing through the resolved config and theme. | Status: done
 
 ### 6.5 Streaming Tests
 
 - [ ] **Test character-by-character paragraph rendering** — Feed a complete paragraph one character at a time. Verify concatenated output matches batch rendering. | Status: not_done
-- [ ] **Test streaming code block rendering** — Feed a code block token by token (opening fence, language tag, newline, code lines, closing fence). Verify syntax highlighting is applied. | Status: not_done
-- [ ] **Test streaming thinking block rendering** — Feed a thinking block incrementally. Verify header appears when opening tag is complete, content renders dimmed, block closes correctly. | Status: not_done
-- [ ] **Test streaming mixed elements** — Feed a response with heading, paragraph, code block, thinking block, and list. Verify streaming output is semantically equivalent to batch rendering. | Status: not_done
-- [ ] **Test flush with unclosed code fence** — Open a code fence without closing. Call `flush()`. Verify buffered code content is rendered. | Status: not_done
+- [x] **Test streaming code block rendering** — Feed a code block token by token (opening fence, language tag, newline, code lines, closing fence). Verify syntax highlighting is applied. | Status: done
+- [x] **Test streaming thinking block rendering** — Feed a thinking block incrementally. Verify header appears when opening tag is complete, content renders dimmed, block closes correctly. | Status: done
+- [x] **Test streaming mixed elements** — Feed a response with heading, paragraph, code block, thinking block, and list. Verify streaming output is semantically equivalent to batch rendering. | Status: done
+- [x] **Test flush with unclosed code fence** — Open a code fence without closing. Call `flush()`. Verify buffered code content is rendered. | Status: done
 - [ ] **Test flush with unclosed thinking block** — Open a thinking block without closing. Call `flush()`. Verify thinking content is rendered with truncation note. | Status: not_done
 - [ ] **Test streaming list growth** — Start a list that keeps growing. Verify each new list item is rendered as it arrives. | Status: not_done
 - [ ] **Test state machine transitions** — Verify `text` -> `code-fence` on opening fence, `code-fence` -> `text` on closing fence. Verify `text` -> `thinking` on `<thinking>`, `thinking` -> `text` on `</thinking>`. | Status: not_done
 - [ ] **Test inline formatting across chunks** — Open bold in one chunk, close it in another. Verify bold styling is correctly applied across the boundary. | Status: not_done
-- [ ] **Test `renderStream` with AsyncIterable** — Create an async iterable of chunks and verify `renderStream` yields correct rendered output. | Status: not_done
+- [x] **Test `renderStream` with AsyncIterable** — Create an async iterable of chunks and verify `renderStream` yields correct rendered output. | Status: done
 - [ ] **Create streaming test fixtures** — Create `src/__tests__/fixtures/streaming.ts` with chunked input sequences for various scenarios. | Status: not_done
 
 ---
@@ -318,35 +318,35 @@
 
 ## Phase 8: Theme Tests
 
-- [ ] **Test dark theme colors** — Verify H1 uses bright white, code keywords use magenta, strings use green in dark theme. | Status: not_done
-- [ ] **Test light theme colors** — Verify H1 uses dark blue, body text uses black in light theme. | Status: not_done
-- [ ] **Test monochrome theme** — Verify no color codes in output. Only bold/dim/underline attributes. | Status: not_done
-- [ ] **Test minimal theme** — Verify reduced color usage. Only bold, dim, underline attributes for text. | Status: not_done
-- [ ] **Test custom theme overrides** — Verify specified overrides are applied. Verify unspecified elements use the base theme defaults. | Status: not_done
-- [ ] **Test custom theme with `baseTheme`** — Verify a custom theme based on `light` inherits light theme defaults for unspecified elements. | Status: not_done
-- [ ] **Test theme auto-detection** — Verify `COLORFGBG` env var is checked. Verify `AI_TERMINAL_MD_THEME` env var overrides default. | Status: not_done
+- [x] **Test dark theme colors** — Verify H1 uses bright white, code keywords use magenta, strings use green in dark theme. | Status: done
+- [x] **Test light theme colors** — Verify H1 uses dark blue, body text uses black in light theme. | Status: done
+- [x] **Test monochrome theme** — Verify no color codes in output. Only bold/dim/underline attributes. | Status: done
+- [x] **Test minimal theme** — Verify reduced color usage. Only bold, dim, underline attributes for text. | Status: done
+- [x] **Test custom theme overrides** — Verify specified overrides are applied. Verify unspecified elements use the base theme defaults. | Status: done
+- [x] **Test custom theme with `baseTheme`** — Verify a custom theme based on `light` inherits light theme defaults for unspecified elements. | Status: done
+- [x] **Test theme auto-detection** — Verify `COLORFGBG` env var is checked. Verify `AI_TERMINAL_MD_THEME` env var overrides default. | Status: done
 
 ---
 
 ## Phase 9: Configuration and Environment Variable Tests
 
 - [ ] **Test each config option changes output** — For every config option (`thinking`, `artifacts`, `toolUse`, `toolResult`, `semanticWrappers`, `citations`, `codeBackground`, `codeLineNumbers`, `codeLanguageLabel`, `codePadding`, `tableStyle`, `showLinkUrls`, `wordWrap`, `margin`), verify that changing the option changes the rendered output as documented. | Status: not_done
-- [ ] **Test `AI_TERMINAL_MD_THEME` env var** — Verify theme is set from env var when not in config. | Status: not_done
+- [x] **Test `AI_TERMINAL_MD_THEME` env var** — Verify theme is set from env var when not in config. | Status: done
 - [ ] **Test `AI_TERMINAL_MD_THINKING` env var** — Verify thinking mode is set from env var when not in config. | Status: not_done
-- [ ] **Test `AI_TERMINAL_MD_WIDTH` env var** — Verify width is set from env var when not in config. | Status: not_done
-- [ ] **Test `NO_COLOR` env var** — Verify color is disabled when `NO_COLOR` is set. | Status: not_done
-- [ ] **Test `FORCE_COLOR` env var** — Verify color level is set to the specified value (0/1/2/3). | Status: not_done
-- [ ] **Test explicit config overrides env vars** — Verify that when both config and env var are set, config wins. | Status: not_done
+- [x] **Test `AI_TERMINAL_MD_WIDTH` env var** — Verify width is set from env var when not in config. | Status: done
+- [x] **Test `NO_COLOR` env var** — Verify color is disabled when `NO_COLOR` is set. | Status: done
+- [x] **Test `FORCE_COLOR` env var** — Verify color level is set to the specified value (0/1/2/3). | Status: done
+- [x] **Test explicit config overrides env vars** — Verify that when both config and env var are set, config wins. | Status: done
 
 ---
 
 ## Phase 10: Edge Cases and Robustness
 
-- [ ] **Handle empty input** — Verify `render("")` returns empty string without error. | Status: not_done
-- [ ] **Handle very long lines** — Verify lines exceeding terminal width are handled gracefully (wrapped for text, overflow for code). | Status: not_done
-- [ ] **Handle deeply nested lists** — Verify 4+ levels of nesting render with correct bullet progression and indentation. | Status: not_done
+- [x] **Handle empty input** — Verify `render("")` returns empty string without error. | Status: done
+- [x] **Handle very long lines** — Verify lines exceeding terminal width are handled gracefully (wrapped for text, overflow for code). | Status: done
+- [x] **Handle deeply nested lists** — Verify 4+ levels of nesting render with correct bullet progression and indentation. | Status: done
 - [ ] **Handle tables with many columns** — Verify wide tables overflow terminal width without crashing. | Status: not_done
-- [ ] **Handle code blocks with no language tag** — Verify rendered with background but no syntax highlighting and no language label. | Status: not_done
+- [x] **Handle code blocks with no language tag** — Verify rendered with background but no syntax highlighting and no language label. | Status: done
 - [ ] **Handle mixed AI elements and standard markdown** — Verify a complex document with thinking, artifacts, tool calls, headings, code, tables, and lists renders correctly with all elements properly formatted and ordered. | Status: not_done
 - [ ] **Handle Unicode edge cases** — Test CJK characters (double-width), emoji, and combining marks in text and tables. Verify width calculation accounts for double-width characters. | Status: not_done
 - [ ] **Handle nested AI elements** — Verify markdown inside thinking blocks, code inside artifacts, and other nested combinations render correctly. | Status: not_done
@@ -369,10 +369,10 @@
 
 ## Phase 12: Test Infrastructure
 
-- [ ] **Create `stripAnsi` test helper** — Utility function that removes all ANSI escape codes from a string. Used in tests to verify textual content independent of styling. | Status: not_done
+- [x] **Create `stripAnsi` test helper** — Utility function that removes all ANSI escape codes from a string. Used in tests to verify textual content independent of styling. | Status: done
 - [ ] **Create `hasAnsiCode` test helper** — Utility function that checks whether a specific ANSI code (e.g., bold, dim, a specific color) is present in a string. | Status: not_done
-- [ ] **Create `renderAndStrip` test helper** — Convenience function that renders markdown and strips ANSI, returning plain text for content verification. | Status: not_done
-- [ ] **Set up test fixtures directory** — Create `src/__tests__/fixtures/` with all fixture files referenced by tests. | Status: not_done
+- [x] **Create `renderAndStrip` test helper** — Convenience function that renders markdown and strips ANSI, returning plain text for content verification. | Status: done
+- [x] **Set up test fixtures directory** — Create `src/__tests__/fixtures/` with all fixture files referenced by tests. | Status: done
 
 ---
 
